@@ -18,11 +18,28 @@ void DroselServer::RunServer(const std::string& port)
 			for (auto& dt : splitted)
 			{
 				auto vec = ksTools::split_by_delms(dt, ":");
-				ksTools::trim(vec[0]);
-				ksTools::trim(vec[1]);
-				request.header.AddHeader(vec[0], vec[1]);
+				if (vec.size() > 1)
+				{
+					ksTools::trim(vec[0]);
+					if (vec.size() > 2)
+					{
+						std::string tmp;
+						for (auto i = vec.begin() + 1; i < vec.end(); i++)
+						{
+							if (i != vec.end() - 1)
+							{
+								tmp += *i + ":";
+							}
+						}
+						request.header.AddHeader(vec[0], tmp);
+					}
+					else
+					{
+						request.header.AddHeader(vec[0], vec[1]);
+					}
+				}
 			}
-			Handler(request, *server.get());
+			Handler hnd(request, *server.get());
 		}
 	}
 }
