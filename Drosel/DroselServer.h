@@ -10,6 +10,8 @@ class DroselServer
 {
 private:
 	std::unique_ptr<NetworkServer> server;
+	std::unordered_map < std::string, std::function<void(Request&, Response&)>> callables;
 public:
+	void OnPath(const std::string& path, std::function<void(Request&, Response&)> callable);
 	void RunServer(const std::string& port);
 };

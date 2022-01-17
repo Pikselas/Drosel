@@ -1,5 +1,10 @@
 #include "DroselServer.h"
 
+void DroselServer::OnPath(const std::string& path, std::function<void(Request&, Response&)> callable)
+{
+	callables[path] = callable;
+}
+
 void DroselServer::RunServer(const std::string& port)
 {
 	server = std::make_unique<NetworkServer>(port);
@@ -39,7 +44,12 @@ void DroselServer::RunServer(const std::string& port)
 					}
 				}
 			}
+			/*std::thread([this, request]() {
+				Handler hnd (request, *server.get());
+				hnd(callables[request.path]);
+				}).detach();*/
 			Handler hnd(request, *server.get());
+			hnd(callables[path]);
 		}
 	}
 }
