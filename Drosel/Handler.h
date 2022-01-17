@@ -11,5 +11,5 @@ private:
 private:
 	NetworkBuilder connection;
 public:
-	Handler(Request request, const NetworkServer& server);
+	Handler(Request request, NetworkBuilder& server);
 };
