@@ -1,5 +1,5 @@
 #include"Handler.h"
-Handler::Handler( Request request, NetworkBuilder& connection) : request(request) , connection(connection)
+Handler::Handler( Request request, const NetworkServer& server) : request(request)
 {
-
+	server.MoveConnection(connection);
 }

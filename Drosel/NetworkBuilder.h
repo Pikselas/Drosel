@@ -38,16 +38,15 @@ private:
 protected:
 	constexpr static int RECEIVE_SIZE = 4096;
 	std::string RECV_BUFF;
- 	bool HasConnection = false;
-	SOCKET CONNECTION_SOCKET = INVALID_SOCKET;
+ 	mutable bool HasConnection = false;
+	mutable SOCKET CONNECTION_SOCKET = INVALID_SOCKET;
 public:
 	NetworkBuilder();
 	~NetworkBuilder();
 public:
 	static std::vector<std::string> GetDeviceIPs();
 public:
-	void MoveConnection(NetworkBuilder& nb);
-	void operator=(NetworkBuilder& nb);
+	void MoveConnection(NetworkBuilder& nb) const;
 	bool IsConnected() const noexcept;
 	void ResizeReceiveBuffer(const int size) noexcept;
     void Send(const std::string& data);

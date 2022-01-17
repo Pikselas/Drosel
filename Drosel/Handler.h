@@ -1,7 +1,7 @@
 #pragma once
 #include"Request.h"
 #include"Response.h"
-#include"NetworkBuilder.h"
+#include"NetworkServer.h"
 #include<functional>
 class Handler
 {
@@ -11,5 +11,5 @@ private:
 private:
 	NetworkBuilder connection;
 public:
-	Handler(Request request, NetworkBuilder& connection);
+	Handler(Request request, const NetworkServer& server);
 };

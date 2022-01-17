@@ -50,17 +50,12 @@ NetworkBuilder::~NetworkBuilder()
 	DisConnect();
 }
 
-void NetworkBuilder::MoveConnection(NetworkBuilder& nb)
+void NetworkBuilder::MoveConnection(NetworkBuilder& nb) const
 {
 	nb.CONNECTION_SOCKET = CONNECTION_SOCKET;
 	nb.HasConnection = HasConnection;
 	HasConnection = false;
 	CONNECTION_SOCKET = INVALID_SOCKET;
-}
-
-void NetworkBuilder::operator=(NetworkBuilder& nb)
-{
-	MoveConnection(nb);
 }
 
 bool NetworkBuilder::IsConnected() const noexcept
