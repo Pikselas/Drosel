@@ -39,8 +39,10 @@ protected:
 	std::unique_ptr<char[]> RECV_BUFF;
  	bool HasConnection = false;
 	SOCKET CONNECTION_SOCKET = INVALID_SOCKET;
-public:
+protected:
 	NetworkBuilder();
+public:
+	NetworkBuilder(const NetworkBuilder&) = delete;
 	NetworkBuilder(NetworkBuilder&& nb) noexcept;
 	~NetworkBuilder();
 public:
