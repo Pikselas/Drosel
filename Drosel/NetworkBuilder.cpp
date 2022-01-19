@@ -22,7 +22,14 @@ NetworkBuilder::Starter::~Starter()
 }
 NetworkBuilder::NetworkBuilder()
 {
-	ResizeReceiveBuffer(RECEIVE_SIZE);
+	ResizeReceiveBuffer(RECEIVE_BUFF_SIZE);
+}
+NetworkBuilder::NetworkBuilder(NetworkBuilder&& nb) noexcept
+{
+	CONNECTION_SOCKET = nb.CONNECTION_SOCKET;
+	HasConnection = nb.HasConnection;
+	nb.CONNECTION_SOCKET = INVALID_SOCKET;
+	HasConnection = false;
 }
 std::vector<std::string> NetworkBuilder::GetDeviceIPs()
 {
@@ -50,30 +57,22 @@ NetworkBuilder::~NetworkBuilder()
 	DisConnect();
 }
 
-void NetworkBuilder::MoveConnection(NetworkBuilder& nb) const
-{
-	nb.CONNECTION_SOCKET = CONNECTION_SOCKET;
-	nb.HasConnection = HasConnection;
-	HasConnection = false;
-	CONNECTION_SOCKET = INVALID_SOCKET;
-}
-
 bool NetworkBuilder::IsConnected() const noexcept
 {
 	return HasConnection;
 }
 
-void NetworkBuilder::ResizeReceiveBuffer(int size) noexcept
+void NetworkBuilder::ResizeReceiveBuffer(const int size) noexcept
 {
-	RECV_BUFF.resize(size);
+	RECV_BUFF = std::make_unique<char[]>(size);
 }
 
 void NetworkBuilder::Send(const std::string& data)
 {
-	Send(data.c_str(), data.length());
+	Send(data.c_str(), (int) data.length());
 }
 
-void NetworkBuilder::Send(const char* DataBuffer, const size_t DataLen)
+void NetworkBuilder::Send(const char* DataBuffer, const int DataLen)
 {
 	if (send(CONNECTION_SOCKET, DataBuffer , DataLen, 0) == SOCKET_ERROR)
 	{
@@ -83,14 +82,10 @@ void NetworkBuilder::Send(const char* DataBuffer, const size_t DataLen)
 
 std::optional<std::string_view> NetworkBuilder::Receive()
 {
-	auto Res = recv(CONNECTION_SOCKET, &RECV_BUFF.at(0), RECV_BUFF.length(), 0);
+	auto Res = recv(CONNECTION_SOCKET, RECV_BUFF.get(), RECEIVE_BUFF_SIZE, 0);
 	if (Res > 0)
 	{
-		if (Res < RECV_BUFF.length())
-		{
-			return std::string_view(RECV_BUFF).substr(0,Res);
-		}
-		return RECV_BUFF;
+		return std::string_view(RECV_BUFF.get(), Res);
 	}
 	else if (Res == SOCKET_ERROR)
 	{
@@ -103,16 +98,16 @@ std::optional<std::string_view> NetworkBuilder::Receive()
 	return {};
 }
 
-std::optional<std::pair<const char*,size_t>> NetworkBuilder::Receive(size_t size)
+std::optional<std::pair<const char*,int>> NetworkBuilder::Receive(int size)
 {
-	if (size > RECV_BUFF.length())
+	if (size > RECEIVE_BUFF_SIZE)
 	{
-		RECV_BUFF.resize(size);
+		ResizeReceiveBuffer(size);
 	}
-	auto Res = recv(CONNECTION_SOCKET, &RECV_BUFF.at(0), size, 0);
+	auto Res = recv(CONNECTION_SOCKET, RECV_BUFF.get(), size, 0);
 	if (Res > 0)
 	{
-		return std::make_pair(& RECV_BUFF.at(0), Res);
+		return std::make_pair(RECV_BUFF.get(), Res);
 	}
 	else if (Res == SOCKET_ERROR)
 	{

@@ -48,7 +48,7 @@ void DroselServer::RunServer(const std::string& port)
 				Handler hnd (request, *server.get());
 				hnd(callables[request.path]);
 				}).detach();*/
-			Handler hnd(request, *server.get());
+			Handler hnd(request, *server);
 			hnd(callables[path]);
 		}
 	}

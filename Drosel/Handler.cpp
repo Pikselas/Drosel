@@ -1,7 +1,7 @@
 #include"Handler.h"
-Handler::Handler( Request request, NetworkBuilder& conn) : request(request)
+Handler::Handler( Request request, NetworkBuilder& conn) : request(request) , connection(std::move(conn))
 {
-	conn.MoveConnection(connection);
+		
 }
 
 Handler::~Handler()
