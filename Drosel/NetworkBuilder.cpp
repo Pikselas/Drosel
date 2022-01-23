@@ -28,6 +28,7 @@ NetworkBuilder::NetworkBuilder(NetworkBuilder&& nb) noexcept
 {
 	CONNECTION_SOCKET = nb.CONNECTION_SOCKET;
 	HasConnection = nb.HasConnection;
+	ResizeReceiveBuffer(nb.RECEIVE_BUFF_SIZE);
 	nb.CONNECTION_SOCKET = INVALID_SOCKET;
 	HasConnection = false;
 }

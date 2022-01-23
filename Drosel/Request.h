@@ -1,10 +1,15 @@
 #pragma once
 #include"Header.h"
-struct Request
+class Request
 {
+public:
 	using u_map = std::unordered_map<std::string, std::string>;
-	std::string path;
 	u_map GET;
 	u_map POST;
 	Header header;
+public:
+	Request() = default;
+	Request(Header hdr) : header(std::move(hdr)){}
+	Request(Request&&) noexcept = default;
+	Request(const Request&) = default;
 };

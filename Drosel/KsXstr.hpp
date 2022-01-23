@@ -93,4 +93,36 @@ namespace ksTools
    LIST.emplace_back(tmp);
    return LIST;
  }
+
+ inline auto split_by_word(const char* str, size_t str_size, const char* word, size_t word_size)
+ {
+     std::vector<std::vector<char>> LIST;
+     size_t flaggedPoint = 0;
+     for (size_t i = 0; i < str_size; i++)
+     {
+         if (i + word_size > str_size)
+         {
+             break;
+         }
+         else if (str[i] == word[0])
+         {
+             bool Found = true;
+             for (size_t j = 1; j < word_size; j++)
+             {
+                 if (str[i + j] != word[j])
+                 {
+                     Found = false;
+                     break;
+                 }
+             }
+             if (Found)
+             {
+                 LIST.emplace_back(str + flaggedPoint, str + i);
+                 flaggedPoint = (i += word_size);
+             }
+         }
+     }
+     LIST.emplace_back(str + flaggedPoint, str + str_size);
+     return LIST;
+ }
 }

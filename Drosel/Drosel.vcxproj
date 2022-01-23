@@ -149,6 +149,7 @@
     <ClCompile Include="main.cpp" />
     <ClCompile Include="NetworkBuilder.cpp" />
     <ClCompile Include="NetworkServer.cpp" />
+    <ClCompile Include="Parser.cpp" />
     <ClCompile Include="Response.cpp" />
   </ItemGroup>
   <ItemGroup>
@@ -158,6 +159,7 @@
     <ClInclude Include="KsXstr.hpp" />
     <ClInclude Include="NetworkBuilder.h" />
     <ClInclude Include="NetworkServer.h" />
+    <ClInclude Include="Parser.h" />
     <ClInclude Include="Request.h" />
     <ClInclude Include="Response.h" />
   </ItemGroup>

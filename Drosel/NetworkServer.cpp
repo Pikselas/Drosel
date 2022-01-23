@@ -36,7 +36,7 @@ NetworkServer::~NetworkServer()
 
 void NetworkServer::Listen() const
 {
-    if(listen(LISTEN_SOCKET, 1) == SOCKET_ERROR)
+    if(listen(LISTEN_SOCKET, SOMAXCONN) == SOCKET_ERROR)
     {
         ThrowException(WSAGetLastError());
     }

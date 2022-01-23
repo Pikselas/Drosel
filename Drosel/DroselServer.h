@@ -6,6 +6,7 @@
 #include"NetworkServer.h"
 #include"KsXstr.hpp"
 #include"Request.h"
+#include"Parser.h"
 class DroselServer
 {
 private:
