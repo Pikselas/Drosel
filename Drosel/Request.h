@@ -7,6 +7,8 @@ public:
 	u_map GET;
 	u_map POST;
 	Header header;
+	std::string ClientIP;
+	std::string METHOD;
 public:
 	Request() = default;
 	Request(Header hdr) : header(std::move(hdr)){}

@@ -19,4 +19,5 @@ public:
 	Header ParseHeaders() const;
 	const std::string& ParsePath() const;
 	const std::string& ParseRequestMethod();
+	std::unordered_map<std::string, std::string> ParsePathData();
 };

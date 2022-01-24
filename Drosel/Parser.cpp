@@ -67,3 +67,17 @@ const std::string& Parser::ParseRequestMethod()
 {
 	return FIRST_LINE_SPLITTED[0];
 }
+
+std::unordered_map<std::string, std::string> Parser::ParsePathData()
+{
+	std::unordered_map<std::string, std::string> GET_DATA;
+	auto splittedAr = std::move(ksTools::split_by_delms(RAW_GET_DATA, "&"));
+	for (auto& evrElm : splittedAr)
+	{
+		auto Obj = std::move(ksTools::split_by_delms(evrElm, "="));
+		ksTools::trim(Obj.front());
+		ksTools::trim(Obj.back());
+		GET_DATA[Obj.front()] = Obj.back();
+	}
+	return GET_DATA;
+}

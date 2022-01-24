@@ -18,6 +18,9 @@ void DroselServer::RunServer(const std::string& port)
 			Parser ps(rawData.value().first , rawData.value().second);
 			auto path = ps.ParsePath();
 			Request request(std::move(ps.ParseHeaders()));
+			request.ClientIP = server->GetClientIP();
+			request.METHOD = ps.ParseRequestMethod();
+			request.GET = std::move(ps.ParsePathData());
 			/*std::thread([this, request]() {
 				Handler hnd (request, *server.get());
 				hnd(callables[request.path]);

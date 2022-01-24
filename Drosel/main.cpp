@@ -1,13 +1,22 @@
 #include<iostream>
 #include"DroselServer.h"
-#include<array>
 int main()
 {
 	try
 	{
 		DroselServer ds;
-		ds.OnPath("/", [](auto& req , auto& res) {
-			res.SendString("<h1>cvxb</h1>");
+		ds.OnPath("/", [](auto& req, auto& res) {
+			std::ostringstream ss;
+			ss << "<table>";
+			for (auto& x : req.GET)
+			{
+				ss << "<tr>"
+					<< "<td>" << x.first << "</td>"
+					<< "<td>" << x.second << "</td>"
+					<< "</tr>";
+ 			}
+			ss << "</table>";
+			res.SendString(ss.str());
 			});
 		ds.RunServer("3456");
 	}
