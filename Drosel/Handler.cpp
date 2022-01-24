@@ -4,7 +4,9 @@ Handler::Handler( Request request, NetworkBuilder& conn) : request(request) , co
 		
 }
 
-Handler::Handler(Handler&& handler) noexcept : request(handler.request), connection(std::move(handler.connection)) 
+Handler::Handler(Handler&& handler) noexcept
+	: 
+request(handler.request), connection(std::move(handler.connection)) , RAW_RESPONSE_DATA(std::move(handler.RAW_RESPONSE_DATA))
 {
 	moved = true;
 }
@@ -18,7 +20,9 @@ Handler::~Handler()
 		ostr << response.headers.CounstructRaw();
 		ostr << "\r\n\r\n";
 		ostr << response.Get();
-		connection.Send(ostr.str());
+		const auto& stremData = ostr.str();
+		std::copy(stremData.begin(), stremData.end(), std::back_inserter(RAW_RESPONSE_DATA));
+		connection.Send(RAW_RESPONSE_DATA.data() , RAW_RESPONSE_DATA.size());
 	}
 }
 

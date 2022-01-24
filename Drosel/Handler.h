@@ -4,6 +4,7 @@
 #include"NetworkServer.h"
 #include<functional>
 #include<sstream>
+#include<vector>
 class Handler
 {
 private:
@@ -11,6 +12,7 @@ private:
 private:
 	Request request;
 	Response response;
+	std::vector<char> RAW_RESPONSE_DATA;
 private:
 	NetworkBuilder connection;
 public:
