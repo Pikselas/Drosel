@@ -143,8 +143,6 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="DroselServer.cpp" />
-    <ClCompile Include="Handler.cpp" />
     <ClCompile Include="Header.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="NetworkBuilder.cpp" />
