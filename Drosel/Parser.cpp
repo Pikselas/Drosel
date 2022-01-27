@@ -81,3 +81,8 @@ std::unordered_map<std::string, std::string> Parser::ParsePathData()
 	}
 	return GET_DATA;
 }
+
+std::vector<char>& Parser::GetLeftOverData()
+{
+	return RAW_DATA;
+}

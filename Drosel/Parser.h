@@ -20,4 +20,5 @@ public:
 	const std::string& ParsePath() const;
 	const std::string& ParseRequestMethod();
 	std::unordered_map<std::string, std::string> ParsePathData();
+	std::vector<char>& GetLeftOverData();
 };

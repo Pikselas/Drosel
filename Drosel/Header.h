@@ -11,6 +11,9 @@ public:
 	Header(Header&&) noexcept = default;
 	Header(const Header&) = default;
 public:
+	Header& operator= (Header&&) noexcept = default;
+	Header& operator= (const Header&) = default;
+public: 
 	void AddHeader(const std::string& key , const std::string& value);
 	std::optional<std::string> GetHeader(const std::string& key) const;
 	std::string CounstructRaw() const;

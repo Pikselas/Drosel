@@ -14,10 +14,16 @@ private:
 	RequestT request;
 	ResponseT response;
 	std::vector<char> RAW_RESPONSE_DATA;
+	std::vector<char> RAW_REQUEST_DATA;
 private:
 	NetworkBuilder connection;
 public:
-	Handler(RequestT request, NetworkBuilder& server);
+	typedef std::vector<std::function<void(RequestT&, std::vector<char>& , NetworkBuilder& nb)>> FWD_E;
+	typedef	std::vector<std::function<void(ResponseT&, std::vector<char>&)>> BCKWD_E;
+private:
+	BCKWD_E& bckwd_engines;
+public:
+	Handler(RequestT request , std::vector<char> RAW_DATA , FWD_E& f_engines , BCKWD_E& b_engines , NetworkBuilder& server);
 	Handler(Handler&& handler) noexcept;
 	~Handler();
 public:
@@ -25,9 +31,12 @@ public:
 };
 
 template<class RequestT, class ResponseT>
-Handler<RequestT , ResponseT>::Handler(RequestT request, NetworkBuilder & conn) : request(request), connection(std::move(conn))
+Handler<RequestT , ResponseT>::Handler(RequestT request , std::vector<char> RAW_DATA , FWD_E& f_engines , BCKWD_E& b_engines,NetworkBuilder & conn)
+	: 
+RAW_REQUEST_DATA(std::move(RAW_DATA)),
+request(request), connection(std::move(conn)) , bckwd_engines(b_engines) 
 {
-
+	// call forward_engines here
 }
 
 template<class RequestT, class ResponseT>
@@ -50,6 +59,8 @@ Handler<RequestT,ResponseT>::~Handler()
 		ostr << response.Get();
 		const auto& stremData = ostr.str();
 		std::copy(stremData.begin(), stremData.end(), std::back_inserter(RAW_RESPONSE_DATA));
+		// call backward_engines here
+		//..
 		connection.Send(RAW_RESPONSE_DATA.data(), RAW_RESPONSE_DATA.size());
 	}
 }
