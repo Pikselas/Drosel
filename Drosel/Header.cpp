@@ -22,5 +22,9 @@ std::string Header::CounstructRaw() const
 	{
 		tmp += key + ":" + val + "\n";
 	}
+	if (tmp.length() > 0)
+	{
+		tmp.erase(tmp.end() - 1);
+	}
 	return tmp;
 }

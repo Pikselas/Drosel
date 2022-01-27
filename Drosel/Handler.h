@@ -36,7 +36,10 @@ Handler<RequestT , ResponseT>::Handler(RequestT request , std::vector<char> RAW_
 RAW_REQUEST_DATA(std::move(RAW_DATA)),
 request(request), connection(std::move(conn)) , bckwd_engines(b_engines) 
 {
-	// call forward_engines here
+	for (auto& engine : f_engines)
+	{
+		engine(request, RAW_REQUEST_DATA, connection);
+	}
 }
 
 template<class RequestT, class ResponseT>

@@ -1,5 +1,4 @@
 #include"Parser.h"
-#include<iostream>
 Parser::Parser(const char* RawData, size_t size)
 {
 	// dividing Header parts and data parts
@@ -33,26 +32,16 @@ Header Parser::ParseHeaders() const
 	Header header;
 	for (auto& dt : RAW_HEADER)
 	{
-		auto vec = ksTools::split_by_delms(dt, ":");
-		if (vec.size() > 1)
+		auto Splitted = std::move(ksTools::split_by_delms( dt, ":"));
+		if (Splitted.size() > 1)
 		{
-			ksTools::trim(vec[0]);
-			if (vec.size() > 2)
+			if (Splitted.size() > 2)
 			{
-				std::string tmp;
-				for (auto i = vec.begin() + 1; i < vec.end(); i++)
-				{
-					if (i != vec.end() - 1)
-					{
-						tmp += *i + ":";
-					}
-				}
-				header.AddHeader(vec[0], tmp);
+				Splitted[1] = ksTools::merge_by_delm(Splitted.begin() + 1, Splitted.end(), ":");
 			}
-			else
-			{
-				header.AddHeader(vec[0], vec[1]);
-			}
+			ksTools::trim(Splitted[0]);
+			ksTools::trim(Splitted[1]);
+			header.AddHeader(Splitted[0], Splitted[1]);
 		}
 	}
 	return header;

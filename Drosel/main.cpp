@@ -1,10 +1,16 @@
 #include<iostream>
 #include"DroselServer.h"
+#include"PostParser.h"
 int main()
 {
 	try
 	{
-		DroselServer ds;
+		DroselServer<
+			FinalRequestType<PostParser::RequestT> 
+		> ds;
+
+		ds.UseEngine(PostParser());
+
 		ds.OnPath("/", [](auto& req, auto& res) {
 			std::ostringstream ss;
 			ss << "<table>";

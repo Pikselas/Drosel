@@ -125,4 +125,13 @@ namespace ksTools
      LIST.emplace_back(str + flaggedPoint, str + str_size);
      return LIST;
  }
+ inline auto merge_by_delm(const auto bg , const auto en ,const std::string& delm)
+ {
+     std::string s;
+     std::for_each(bg, en, [&](auto str) {
+         s += str + ":";
+         });
+     s.erase(s.end() - 1);
+     return s;
+ }
 }
