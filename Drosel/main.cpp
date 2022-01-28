@@ -22,7 +22,7 @@ int main()
 					<< "</tr>";
  			}
 			ss << "</table>";
-			res.SendString(ss.str());
+			res.AddString(ss.str());
 			});
 		ds.RunServer("3456");
 	}
