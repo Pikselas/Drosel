@@ -14,11 +14,11 @@ class DroselServer
 private:
 	std::unique_ptr<NetworkServer> server;
 	std::unordered_map < std::string, std::function<void(RequestT&, ResponseT&)>> PATH_FUNCTIONS;
-	std::vector<std::function<void(RequestT& , std::vector<char>& , NetworkBuilder& nb)>> FORWARD_ENGINES;
+	std::vector<std::function<void(RequestT& , std::vector <std::vector<char>>& , NetworkBuilder& nb)>> FORWARD_ENGINES;
 	std::vector<std::function<void(ResponseT&, std::vector<char>&)>> BACKWARD_ENGINES;
 public:
 	void OnPath(const std::string& path, std::function<void(RequestT&, ResponseT&)> path_function);
-	void UseEngine(std::function<void(RequestT&, std::vector<char>& , NetworkBuilder& nb)> engine);
+	void UseEngine(std::function<void(RequestT&, std::vector<std::vector<char>>& , NetworkBuilder& nb)> engine);
 	void UseEngine(std::function<void(ResponseT&, std::vector<char>&)> engine);
 	void RunServer(const std::string& port);
 };
@@ -31,7 +31,7 @@ void DroselServer<RequestT, ResponseT>::OnPath(const std::string& path, std::fun
 }
 
 template<class RequestT, class ResponseT>
-void DroselServer<RequestT, ResponseT>::UseEngine(std::function<void(RequestT&, std::vector<char>& , NetworkBuilder& nb)> engine)
+void DroselServer<RequestT, ResponseT>::UseEngine(std::function<void(RequestT&, std::vector <std::vector<char>>& , NetworkBuilder& nb)> engine)
 {
 	FORWARD_ENGINES.emplace_back(engine);
 }
@@ -60,6 +60,7 @@ void DroselServer < RequestT, ResponseT>::RunServer(const std::string& port)
 			request.ClientIP = server->GetClientIP();
 			request.METHOD = ps.ParseRequestMethod();
 			request.GET = std::move(ps.ParsePathData());
+
 			/*std::thread([this, request]() {
 				Handler hnd (request, *server.get());
 				hnd(callables[request.path]);

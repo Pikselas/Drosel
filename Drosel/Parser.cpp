@@ -14,7 +14,10 @@ Parser::Parser(const char* RawData, size_t size)
 	
 	// storing Raw data
 
-	RAW_DATA = std::move(RAW_DATA_AND_HEADER.back());
+	RAW_DATA_AND_HEADER.erase(RAW_DATA_AND_HEADER.begin());
+
+	RAW_DATA = std::move(RAW_DATA_AND_HEADER);
+
 	auto EndItr = FIRST_LINE_SPLITTED[1].end();
 	for (auto i = FIRST_LINE_SPLITTED[1].begin(); i < EndItr; i++)
 	{
@@ -71,7 +74,7 @@ std::unordered_map<std::string, std::string> Parser::ParsePathData()
 	return GET_DATA;
 }
 
-std::vector<char>& Parser::GetLeftOverData()
+std::vector<std::vector<char>>& Parser::GetLeftOverData()
 {
 	return RAW_DATA;
 }

@@ -11,18 +11,15 @@ public:
 	public:
 		std::unordered_map<std::string, std::string> POST;
  	};
-	void operator()(RequestT& request, std::vector<char>& raw, NetworkBuilder& nb)
+	void operator()(RequestT& request, std::vector <std::vector<char>>& raw, NetworkBuilder& nb)
 	{
 		if (request.METHOD == "POST")
 		{
 			if (auto x = request.header.GetHeader("Content-Type"))
 			{
-				if (x.value() == "application/x-www-form-urlencoded")
+				for (auto& x : raw)
 				{
-					for (auto r : raw)
-					{
-						std::cout << r;
-					}
+					std::copy(x.begin(), x.end(), std::ostream_iterator<char>(std::cout));
 				}
 			}
 		}
