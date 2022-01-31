@@ -15,7 +15,7 @@ public:
 	{
 		if (request.METHOD == "POST")
 		{
-			if (auto x = request.header.GetHeader("Content-Type"))
+			if (auto x = request.headers.GetHeader("Content-Type"))
 			{
 				for (auto& x : raw)
 				{

@@ -12,13 +12,10 @@ private:
 private:
 	std::vector<std::vector<char>> RAW_DATA;
 	std::vector<std::string> RAW_HEADER;
-private:
-	int PathDataBeginIndex;
 public:
-	Parser(const char* RawData , size_t size);
+	Parser(std::vector<char>::const_iterator vItrStart, std::vector<char>::const_iterator vItrEnd);
 	Header ParseHeaders() const;
 	const std::string& ParsePath() const;
 	const std::string& ParseRequestMethod();
 	std::unordered_map<std::string, std::string> ParsePathData();
-	std::vector<std::vector<char>>& GetLeftOverData();
 };

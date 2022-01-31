@@ -1,10 +1,8 @@
 #include"Parser.h"
-Parser::Parser(const char* RawData, size_t size)
+Parser::Parser(std::vector<char>::const_iterator vItrStart, std::vector<char>::const_iterator vItrEnd)
 {
-	// dividing Header parts and data parts
-	auto RAW_DATA_AND_HEADER = std::move(ksTools::split_by_word(RawData , size , "\r\n\r\n" , 4));
-	std::string FirstLine(RAW_DATA_AND_HEADER.front().begin(),RAW_DATA_AND_HEADER.front().end());
-	
+	std::string FirstLine(vItrStart , vItrEnd);
+
 	// sperating all the headers by line
 	RAW_HEADER = std::move(ksTools::split_by_word(FirstLine, "\r\n"));
 	
@@ -12,12 +10,6 @@ Parser::Parser(const char* RawData, size_t size)
 	FIRST_LINE_SPLITTED = std::move(ksTools::split_by_delms(RAW_HEADER.front(), " "));
 	RAW_HEADER.erase(RAW_HEADER.begin());
 	
-	// storing Raw data
-
-	RAW_DATA_AND_HEADER.erase(RAW_DATA_AND_HEADER.begin());
-
-	RAW_DATA = std::move(RAW_DATA_AND_HEADER);
-
 	auto EndItr = FIRST_LINE_SPLITTED[1].end();
 	for (auto i = FIRST_LINE_SPLITTED[1].begin(); i < EndItr; i++)
 	{
@@ -72,9 +64,4 @@ std::unordered_map<std::string, std::string> Parser::ParsePathData()
 		GET_DATA[Obj.front()] = Obj.back();
 	}
 	return GET_DATA;
-}
-
-std::vector<std::vector<char>>& Parser::GetLeftOverData()
-{
-	return RAW_DATA;
 }

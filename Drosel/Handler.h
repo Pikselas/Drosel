@@ -14,16 +14,10 @@ private:
 	RequestT request;
 	ResponseT response;
 	std::vector<char> RAW_RESPONSE_DATA;
-	std::vector <std::vector<char>> RAW_REQUEST_DATA;
 private:
 	NetworkBuilder connection;
 public:
-	typedef std::vector<std::function<void(RequestT&, std::vector <std::vector<char>>& , NetworkBuilder& nb)>> FWD_E;
-	typedef	std::vector<std::function<void(ResponseT&, std::vector<char>&)>> BCKWD_E;
-private:
-	BCKWD_E& bckwd_engines;
-public:
-	Handler(RequestT request , std::vector <std::vector<char>> RAW_DATA , FWD_E& f_engines , BCKWD_E& b_engines , NetworkBuilder& server);
+	Handler(RequestT request , NetworkBuilder& server);
 	Handler(Handler&& handler) noexcept;
 	~Handler();
 public:
@@ -31,15 +25,11 @@ public:
 };
 
 template<class RequestT, class ResponseT>
-Handler<RequestT , ResponseT>::Handler(RequestT request , std::vector<std::vector<char>> RAW_DATA , FWD_E& f_engines , BCKWD_E& b_engines,NetworkBuilder & conn)
+Handler<RequestT , ResponseT>::Handler(RequestT request ,NetworkBuilder & conn)
 	: 
-RAW_REQUEST_DATA(std::move(RAW_DATA)),
-request(request), connection(std::move(conn)) , bckwd_engines(b_engines) 
+request(std::move(request)), connection(std::move(conn))
 {
-	for (auto& engine : f_engines)
-	{
-		engine(request, RAW_REQUEST_DATA, connection);
-	}
+
 }
 
 template<class RequestT, class ResponseT>

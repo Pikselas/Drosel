@@ -5,12 +5,12 @@ class Request
 public:
 	using u_map = std::unordered_map<std::string, std::string>;
 	u_map GET;
-	Header header;
+	Header headers;
 	std::string ClientIP;
 	std::string METHOD;
 public:
 	Request() = default;
-	Request(Header hdr) : header(std::move(hdr)){}
+	Request(Header hdr) : headers(std::move(hdr)){}
 	Request(Request&&) noexcept = default;
 	Request(const Request&) = default;
 };

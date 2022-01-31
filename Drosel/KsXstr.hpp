@@ -125,6 +125,39 @@ namespace ksTools
      LIST.emplace_back(str + flaggedPoint, str + str_size);
      return LIST;
  }
+ 
+ inline size_t FindSubStr(const char * const s1, const size_t s1_size, const char * const s2, const size_t s2_size)
+ {
+     for (auto i = 0; i < s1_size; i++)
+     {
+         if (s1[i] == s2[0])
+         {
+             if (s1_size - i < s2_size)
+             {
+                 return s1_size;
+             }
+             else
+             {
+                 bool Found = true;
+                 for (auto j = 1; j < s2_size; j++)
+                 {
+                     if (s1[i + j] != s2[j])
+                     {
+                         Found = false;
+                         break;
+                     }
+                 }
+                 if (Found)
+                 {
+                     return i;
+                 }
+             }
+         }
+     }
+     return s1_size;
+ }
+
+
  inline auto merge_by_delm(const auto bg , const auto en ,const std::string& delm)
  {
      std::string s;
