@@ -58,9 +58,19 @@ std::unordered_map<std::string, std::string> Parser::ParsePathData()
 	auto splittedAr = std::move(ksTools::split_by_delms(RAW_GET_DATA, "&"));
 	for (auto& evrElm : splittedAr)
 	{
+		while (true)
+		{
+			auto Pos = evrElm.find("%20");
+			if (Pos != std::string::npos)
+			{
+				evrElm.erase(Pos, 3);
+			}
+			else
+			{
+				break;
+			}
+		}
 		auto Obj = std::move(ksTools::split_by_delms(evrElm, "="));
-		ksTools::trim(Obj.front());
-		ksTools::trim(Obj.back());
 		GET_DATA[Obj.front()] = Obj.back();
 	}
 	return GET_DATA;
