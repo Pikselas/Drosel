@@ -1,8 +1,10 @@
 #include"Response.h"
 
-std::unordered_map<int, std::string> Response::STATUS_CODE = {
+const std::unordered_map<int, std::string> Response::STATUS_CODES {
 	{200 , "OK"},
-	{404 , "NOT FOUND"} };
+	{404 , "NOT FOUND"},
+	{301 , "Temporary Redirect"} 
+};
 
 void Response::AddString(const std::string& str)
 {

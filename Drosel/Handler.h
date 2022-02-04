@@ -14,10 +14,16 @@ private:
 	RequestT request;
 	ResponseT response;
 	std::vector<char> RAW_RESPONSE_DATA;
+	std::vector<char> RAW_REQUEST_DATA;
 private:
 	NetworkBuilder connection;
+private:
+	size_t TOTAL_BODY;
+	size_t BODY_RECEIVED;
 public:
-	Handler(RequestT request , NetworkBuilder& server);
+	int ReceiveData(int size);
+public:
+	Handler(RequestT request , const std::vector<char>& body, NetworkBuilder& server);
 	Handler(Handler&& handler) noexcept;
 	~Handler();
 public:
@@ -25,11 +31,29 @@ public:
 };
 
 template<class RequestT, class ResponseT>
-Handler<RequestT , ResponseT>::Handler(RequestT request ,NetworkBuilder & conn)
-	: 
-request(std::move(request)), connection(std::move(conn))
+inline int Handler<RequestT, ResponseT>::ReceiveData(int size)
 {
+	if (BODY_RECEIVED < TOTAL_BODY)
+	{
+		if (auto dt = connection.Receive(size))
+		{
+			std::copy_n(dt.value().first, dt.value().second, std::back_inserter(RAW_REQUEST_DATA));
+			return dt.value().second;
+		}
+		else
+		{
+			return 0;
+		}
+	}
+	return 0;
+}
 
+template<class RequestT, class ResponseT>
+Handler<RequestT , ResponseT>::Handler(RequestT request , const std::vector<char>& body , NetworkBuilder & conn)
+	: 
+ request(std::move(request)), RAW_REQUEST_DATA(std::move(body)),connection(std::move(conn))
+{
+	BODY_RECEIVED = RAW_REQUEST_DATA.size();
 }
 
 template<class RequestT, class ResponseT>
@@ -46,7 +70,7 @@ Handler<RequestT,ResponseT>::~Handler()
 	if (!moved)
 	{
 		std::ostringstream ostr;
-		ostr << "HTTP/1.1 " << response.status_code << " " << Response::STATUS_CODE[response.status_code] << "\r\n";
+		ostr << "HTTP/1.1 " << response.STATUS_CODE << " " << Response::STATUS_CODES.at(response.STATUS_CODE) << "\r\n";
 		ostr << response.headers.CounstructRaw();
 		ostr << "\r\n\r\n";
 		ostr << response.Get();
@@ -67,6 +91,6 @@ void Handler<RequestT , ResponseT>::operator()(std::function<void(RequestT&, Res
 	}
 	else
 	{
-		response.status_code = 404;
+		response.STATUS_CODE = 404;
 	}
 }

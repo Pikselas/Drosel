@@ -6,9 +6,9 @@ private:
 	std::string response;
 public:
 	Header headers;
-	int status_code = 200;
+	int STATUS_CODE = 200;
 public:
-	static std::unordered_map<int, std::string> STATUS_CODE;
+	const static std::unordered_map<int, std::string> STATUS_CODES;
 public:
 	void AddString(const std::string& str);
 	std::string Get() const;

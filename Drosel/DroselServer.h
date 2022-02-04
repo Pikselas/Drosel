@@ -60,7 +60,11 @@ void DroselServer < RequestT, ResponseT>::RunServer(const std::string& port)
 		request.ClientIP = server->GetClientIP();
 		request.GET = std::move(HeadParser.ParsePathData());
 
-		Handler<RequestT, ResponseT> hnd(std::move(request), *server);
+		Handler<RequestT, ResponseT> hnd(
+										std::move(request), 
+										{HeadData.begin() + LastFindingPos + 4 , HeadData.end()} ,
+											*server
+										);
 		hnd(PATH_FUNCTIONS[HeadParser.ParsePath()]);
 	}
 }
