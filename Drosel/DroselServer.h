@@ -14,8 +14,10 @@ class DroselServer
 private:
 	std::unique_ptr<NetworkServer> server;
 	std::unordered_map < std::string, std::function<void(RequestT&, ResponseT&)>> PATH_FUNCTIONS;
+	std::vector<typename Handler<RequestT, ResponseT>::FWD_ENGINE_TYPE> FWD_ENGINES;
 public:
 	void OnPath(const std::string& path, std::function<void(RequestT&, ResponseT&)> path_function);
+	void Use(Handler<RequestT,ResponseT>::FWD_ENGINE_TYPE engine);
 	void RunServer(const std::string& port);
 };
 
@@ -24,6 +26,12 @@ template<class RequestT, class ResponseT>
 void DroselServer<RequestT, ResponseT>::OnPath(const std::string& path, std::function<void(RequestT&, ResponseT&)> path_function)
 {
 	PATH_FUNCTIONS[path] = path_function;
+}
+
+template<class RequestT, class ResponseT>
+void DroselServer<RequestT, ResponseT>::Use(Handler<RequestT, ResponseT>::FWD_ENGINE_TYPE engine)
+{
+	FWD_ENGINES.emplace_back(engine);
 }
 
 template<class RequestT, class ResponseT>
@@ -62,7 +70,8 @@ void DroselServer < RequestT, ResponseT>::RunServer(const std::string& port)
 
 		Handler<RequestT, ResponseT> hnd(
 										std::move(request), 
-										{HeadData.begin() + LastFindingPos + 4 , HeadData.end()} ,
+										{HeadData.begin() + LastFindingPos + 4 , HeadData.end()} , 
+											FWD_ENGINES,
 											*server
 										);
 		hnd(PATH_FUNCTIONS[HeadParser.ParsePath()]);
