@@ -10,6 +10,8 @@ class Handler
 {
 private:
 	bool moved = false;
+public:
+	typedef std::function<void(RequestT&, std::vector<char>&, std::function<int(int)>)> FWD_ENGINE_TYPE;
 private:
 	RequestT request;
 	ResponseT response;
@@ -18,12 +20,12 @@ private:
 private:
 	NetworkBuilder connection;
 private:
-	size_t TOTAL_BODY;
+	size_t TOTAL_BODY = 0;
 	size_t BODY_RECEIVED;
 public:
 	int ReceiveData(int size);
 public:
-	Handler(RequestT request , const std::vector<char>& body, NetworkBuilder& server);
+	Handler(RequestT request , const std::vector<char>& body ,const std::vector<FWD_ENGINE_TYPE>& engines, NetworkBuilder& server);
 	Handler(Handler&& handler) noexcept;
 	~Handler();
 public:
@@ -49,11 +51,15 @@ inline int Handler<RequestT, ResponseT>::ReceiveData(int size)
 }
 
 template<class RequestT, class ResponseT>
-Handler<RequestT , ResponseT>::Handler(RequestT request , const std::vector<char>& body , NetworkBuilder & conn)
+Handler<RequestT , ResponseT>::Handler(RequestT request , const std::vector<char>& body , const std::vector<FWD_ENGINE_TYPE>& engines , NetworkBuilder & conn)
 	: 
  request(std::move(request)), RAW_REQUEST_DATA(std::move(body)),connection(std::move(conn))
 {
 	BODY_RECEIVED = RAW_REQUEST_DATA.size();
+	for (auto& engine : engines)
+	{
+		engine(this->request, RAW_REQUEST_DATA, [](int x) {return x; });
+	}
 }
 
 template<class RequestT, class ResponseT>
