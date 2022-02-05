@@ -33,13 +33,14 @@ public:
 };
 
 template<class RequestT, class ResponseT>
-inline int Handler<RequestT, ResponseT>::ReceiveData(int size)
+int Handler<RequestT, ResponseT>::ReceiveData(int size)
 {
 	if (BODY_RECEIVED < TOTAL_BODY)
 	{
 		if (auto dt = connection.Receive(size))
 		{
 			std::copy_n(dt.value().first, dt.value().second, std::back_inserter(RAW_REQUEST_DATA));
+			BODY_RECEIVED += dt.value().second;
 			return dt.value().second;
 		}
 		else
@@ -56,9 +57,16 @@ Handler<RequestT , ResponseT>::Handler(RequestT request , const std::vector<char
  request(std::move(request)), RAW_REQUEST_DATA(std::move(body)),connection(std::move(conn))
 {
 	BODY_RECEIVED = RAW_REQUEST_DATA.size();
+	if (auto Has_Body = this->request.headers.GetHeader("Content-Length"))
+	{
+		std::stringstream ss;
+		ss << Has_Body.value();
+		ss >> TOTAL_BODY;
+	}
+	std::function<int(int)> f = std::bind(&Handler::ReceiveData,this, std::placeholders::_1);
 	for (auto& engine : engines)
 	{
-		engine(this->request, RAW_REQUEST_DATA, [](int x) {return x; });
+		engine(this->request, RAW_REQUEST_DATA, f);
 	}
 }
 
