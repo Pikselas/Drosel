@@ -1,6 +1,7 @@
 #pragma once
 #include<vector>
 #include<iostream>
+#include<sstream>
 #include"Request.h"
 #include"NetworkBuilder.h"
 class PostParser
@@ -13,6 +14,21 @@ public:
  	};
 	void operator()(RequestT& request , std::vector<char>& raw,std::function<int(int)> fn)
 	{
-		std::cout << fn(10);
+		if (request.METHOD == "POST")
+		{
+			size_t len = 0;
+			std::stringstream ss;
+			ss << request.headers.GetHeader("Content-Length").value();
+			ss >> len;
+			len -= raw.size();
+			while (len)
+			{
+				len -= fn(len);
+			}
+			for (auto x : raw)
+			{
+				std::cout << x;
+			}
+		}
 	}
 };

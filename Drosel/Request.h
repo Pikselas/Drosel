@@ -8,6 +8,7 @@ public:
 	Header headers;
 	std::string ClientIP;
 	std::string METHOD;
+	size_t BODY_SIZE = 0;
 public:
 	Request() = default;
 	Request(Header hdr) : headers(std::move(hdr)){}
