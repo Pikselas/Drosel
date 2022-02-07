@@ -22,6 +22,7 @@ private:
 private:
 	size_t TOTAL_BODY = 0;
 	size_t BODY_RECEIVED;
+	constexpr static int RECEIVE_PER_CALL = 914748364;
 public:
 	int ReceiveData(int size);
 public:
@@ -83,6 +84,13 @@ Handler<RequestT,ResponseT>::~Handler()
 {
 	if (!moved)
 	{
+		while (BODY_RECEIVED < TOTAL_BODY)
+		{
+			if (auto ob = connection.Receive(RECEIVE_PER_CALL))
+			{
+				BODY_RECEIVED += ob.value().second;
+			}
+		}
 		std::ostringstream ostr;
 		ostr << "HTTP/1.1 " << response.STATUS_CODE << " " << Response::STATUS_CODES.at(response.STATUS_CODE) << "\r\n";
 		ostr << response.headers.CounstructRaw();
