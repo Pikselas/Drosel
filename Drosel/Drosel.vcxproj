@@ -152,6 +152,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="DroselServer.h" />
+    <ClInclude Include="FilePro.h" />
     <ClInclude Include="Handler.h" />
     <ClInclude Include="Header.h" />
     <ClInclude Include="KsXstr.hpp" />

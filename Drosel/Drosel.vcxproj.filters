@@ -68,5 +68,8 @@
     <ClInclude Include="PostParser.h">
       <Filter>Engines</Filter>
     </ClInclude>
+    <ClInclude Include="FilePro.h">
+      <Filter>Engines</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>

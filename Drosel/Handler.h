@@ -94,14 +94,14 @@ Handler<RequestT,ResponseT>::~Handler()
 				BODY_RECEIVED += ob.value().second;
 			}
 		}
-		std::ostringstream ostr;
-		ostr << "HTTP/1.1 " << response.STATUS_CODE << " " << Response::STATUS_CODES.at(response.STATUS_CODE) << "\r\n";
-		ostr << response.headers.CounstructRaw();
-		ostr << "\r\n\r\n";
 		for (auto& engine : BCKWD_ENGINES)
 		{
 			engine(response, RAW_RESPONSE_DATA);
 		}
+		std::ostringstream ostr;
+		ostr << "HTTP/1.1 " << response.STATUS_CODE << " " << Response::STATUS_CODES.at(response.STATUS_CODE) << "\r\n";
+		ostr << response.headers.CounstructRaw();
+		ostr << "\r\n\r\n";
 		connection.Send(ostr.str());
 		size_t response_size = RAW_RESPONSE_DATA.size();
 		while (response_size > TRANSFERR_PER_CALL)

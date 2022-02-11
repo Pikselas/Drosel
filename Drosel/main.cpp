@@ -1,20 +1,25 @@
 #include<iostream>
+#include<fstream>
+#include<vector>
 #include"DroselServer.h"
 #include"PostParser.h"
+#include"FilePro.h"
 int main()
 {
 	try
 	{
-		DroselServer<PostParser::RequestT> ds;
+		DroselServer
+			<
+			Request,
+			FilePro::ResponseT
+			>
+			ds;
 
-		ds.Use(PostParser{});
+		ds.Use(FilePro{});
 
-		ds.OnPath("/", [](auto& req, auto& res) {
-
-			res.AddString("<h1>Hello World</h2>");
-
+		ds.OnPath("/yokawaii.jpg", [](auto& req, auto& res) {
+			res.SendFile("C:/Users/Aritra Maji/Downloads/yokawaii.jpg");
 			});
-
 		ds.RunServer("3456");
 	}
 	catch (const NetworkBuilder::Exception e)
