@@ -12,21 +12,24 @@ private:
 	bool moved = false;
 public:
 	typedef std::function<void(RequestT&, std::vector<char>&, std::function<int(int)>)> FWD_ENGINE_TYPE;
+	typedef std::function<void(ResponseT& , std::vector<char>&)> BCKWD_ENGINE_TYPE;
 private:
 	RequestT request;
 	ResponseT response;
 	std::vector<char> RAW_RESPONSE_DATA;
 	std::vector<char> RAW_REQUEST_DATA;
 private:
+	const std::vector<BCKWD_ENGINE_TYPE>& BCKWD_ENGINES;
+private:
 	NetworkBuilder connection;
 private:
 	size_t TOTAL_BODY = 0;
 	size_t BODY_RECEIVED;
-	constexpr static int RECEIVE_PER_CALL = 914748364;
+	constexpr static int TRANSFERR_PER_CALL = 1024 * 1024 * 40;
 public:
 	int ReceiveData(int size);
 public:
-	Handler(RequestT request , const std::vector<char>& body ,const std::vector<FWD_ENGINE_TYPE>& engines, NetworkBuilder& server);
+	Handler(RequestT request , const std::vector<char>& body ,const std::vector<FWD_ENGINE_TYPE>& fwd_engines , const std::vector<BCKWD_ENGINE_TYPE>& bckwd_engines , NetworkBuilder& conn);
 	Handler(Handler&& handler) noexcept;
 	~Handler();
 public:
@@ -53,9 +56,9 @@ int Handler<RequestT, ResponseT>::ReceiveData(int size)
 }
 
 template<class RequestT, class ResponseT>
-Handler<RequestT , ResponseT>::Handler(RequestT request , const std::vector<char>& body , const std::vector<FWD_ENGINE_TYPE>& engines , NetworkBuilder & conn)
+Handler<RequestT , ResponseT>::Handler(RequestT request , const std::vector<char>& body , const std::vector<FWD_ENGINE_TYPE>& fwd_engines , const std::vector<BCKWD_ENGINE_TYPE>& bckwd_engines, NetworkBuilder& conn)
 	: 
- request(std::move(request)), RAW_REQUEST_DATA(std::move(body)),connection(std::move(conn))
+ request(std::move(request)), RAW_REQUEST_DATA(std::move(body)) , BCKWD_ENGINES(bckwd_engines),connection(std::move(conn))
 {
 	BODY_RECEIVED = RAW_REQUEST_DATA.size();
 	if (auto Has_Body = this->request.headers.GetHeader("Content-Length"))
@@ -65,7 +68,7 @@ Handler<RequestT , ResponseT>::Handler(RequestT request , const std::vector<char
 		ss >> TOTAL_BODY;
 	}
 	std::function<int(int)> f = std::bind(&Handler::ReceiveData,this, std::placeholders::_1);
-	for (auto& engine : engines)
+	for (auto& engine : fwd_engines)
 	{
 		engine(this->request, RAW_REQUEST_DATA, f);
 	}
@@ -86,7 +89,7 @@ Handler<RequestT,ResponseT>::~Handler()
 	{
 		while (BODY_RECEIVED < TOTAL_BODY)
 		{
-			if (auto ob = connection.Receive(RECEIVE_PER_CALL))
+			if (auto ob = connection.Receive(TRANSFERR_PER_CALL))
 			{
 				BODY_RECEIVED += ob.value().second;
 			}
@@ -95,12 +98,18 @@ Handler<RequestT,ResponseT>::~Handler()
 		ostr << "HTTP/1.1 " << response.STATUS_CODE << " " << Response::STATUS_CODES.at(response.STATUS_CODE) << "\r\n";
 		ostr << response.headers.CounstructRaw();
 		ostr << "\r\n\r\n";
-		ostr << response.Get();
-		const auto& stremData = ostr.str();
-		std::copy(stremData.begin(), stremData.end(), std::back_inserter(RAW_RESPONSE_DATA));
-		// call backward_engines here
-		//..
-		connection.Send(RAW_RESPONSE_DATA.data(), RAW_RESPONSE_DATA.size());
+		for (auto& engine : BCKWD_ENGINES)
+		{
+			engine(response, RAW_RESPONSE_DATA);
+		}
+		connection.Send(ostr.str());
+		size_t response_size = RAW_RESPONSE_DATA.size();
+		while (response_size > TRANSFERR_PER_CALL)
+		{
+			connection.Send(RAW_RESPONSE_DATA.data() + (RAW_RESPONSE_DATA.size() - response_size), TRANSFERR_PER_CALL);
+			response_size -= TRANSFERR_PER_CALL;
+		}
+		connection.Send(RAW_RESPONSE_DATA.data() + (RAW_RESPONSE_DATA.size() - response_size), response_size);
 	}
 }
 
