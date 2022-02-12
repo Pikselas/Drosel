@@ -18,8 +18,23 @@ int main()
 		ds.Use(FilePro{});
 
 		ds.OnPath("/yokawaii.jpg", [](auto& req, auto& res) {
+			
 			res.SendFile("C:/Users/Aritra Maji/Downloads/yokawaii.jpg");
+			
 			});
+
+		ds.OnPath("/favicon.ico", [](auto& req, auto& res) {
+			
+			res.SendFile("D:/server/htdocs/favicon.ico");
+			
+			});
+
+		ds.OnPath("/xt.html", [](auto& req, auto& res) {
+			
+			res.SendFile("C:/Users/Aritra Maji/OneDrive/Desktop/f.html");
+			
+			});
+
 		ds.RunServer("3456");
 	}
 	catch (const NetworkBuilder::Exception e)

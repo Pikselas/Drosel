@@ -1,9 +1,12 @@
 #pragma once
-#include<vector>
+#include<unordered_map>
 #include<fstream>
+#include<optional>
 #include"Response.h"
 class FilePro
 {
+private:
+	const static std::unordered_map<std::string, std::string> CONTENT_TYPES;
 public:
 	class ResponseT : virtual public Response
 	{
@@ -11,20 +14,12 @@ public:
 	private:
 		struct FILE
 		{
-			enum struct TYPE
-			{
-				JPG,
-				PNG,
-				UNKNOWN
-			};
 			std::ifstream file;
 			size_t size = 0;
-			std::string name;
-			TYPE type = TYPE::UNKNOWN;
 		};
 		FILE File;
 	private:
-		static FILE::TYPE GetFileType(const std::string& file)
+		static std::optional<std::string> GetFileType(const std::string& file)
 		{
 			std::string ext;
 			for (auto i = file.rbegin(); i < file.rend(); i++)
@@ -36,17 +31,13 @@ public:
 				}
 				break;
 			}
-			if (ext == "jpg")
+			if (CONTENT_TYPES.find(ext) == CONTENT_TYPES.end())
 			{
-				return FILE::TYPE::JPG;
-			}
-			else if (ext == "png")
-			{
-				return FILE::TYPE::PNG;
+				return {};
 			}
 			else
 			{
-				return FILE::TYPE::UNKNOWN;
+				return CONTENT_TYPES.at(ext);
 			}
 		}
 	public:
@@ -56,24 +47,15 @@ public:
 			File.file.open(file, std::ios_base::binary);
 			if (File.file.good())
 			{
-				File.name = file;
 				File.file.seekg(0, std::ios_base::end);
 				File.size = File.file.tellg();
 				File.file.seekg(0, std::ios_base::beg);
 				std::stringstream ss;
 				ss << File.size;
 				headers.AddHeader("Content-Length", ss.str());
-				using type = ResponseT::FILE::TYPE;
-				switch (ResponseT::GetFileType(File.name))
+				if (auto c_type = GetFileType(file))
 				{
-					case type::JPG:
-						headers.AddHeader("Content-Type", "image/jpg");
-						break;
-					case type::PNG:
-						headers.AddHeader("Content-Type", "image/png");
-						break;
-					case type::UNKNOWN:
-						break;
+					headers.AddHeader("Content-Type", c_type.value());
 				}
 			}
 		}
@@ -86,3 +68,6 @@ public:
 		}
 	}
 };
+const std::unordered_map<std::string, std::string> FilePro::CONTENT_TYPES = {
+	{"png" , "image/png"} , {"jpg" , "image/jpeg"} ,
+	{"ico" , "image/x-icon"},{"jpeg","image/jpeg"} };
