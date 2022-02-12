@@ -60,6 +60,21 @@ public:
 				File.file.seekg(0, std::ios_base::end);
 				File.size = File.file.tellg();
 				File.file.seekg(0, std::ios_base::beg);
+				std::stringstream ss;
+				ss << File.size;
+				headers.AddHeader("Content-Length", ss.str());
+				using type = ResponseT::FILE::TYPE;
+				switch (ResponseT::GetFileType(File.name))
+				{
+					case type::JPG:
+						headers.AddHeader("Content-Type", "image/jpg");
+						break;
+					case type::PNG:
+						headers.AddHeader("Content-Type", "image/png");
+						break;
+					case type::UNKNOWN:
+						break;
+				}
 			}
 		}
 	};
@@ -67,21 +82,6 @@ public:
 	{
 		if (response.File.size > 0)
 		{
-			std::stringstream ss;
-			ss << response.File.size;
-			response.headers.AddHeader("Content-Length" , ss.str());
-			using type = ResponseT::FILE::TYPE;
-			switch (ResponseT::GetFileType(response.File.name))
-			{
-			case type::JPG:
-				response.headers.AddHeader("Content-Type", "image/jpg");
-				break;
-			case type::PNG:
-				response.headers.AddHeader("Content-Type", "image/png");
-				break;
-			case type::UNKNOWN:
-				break;
-			}
 			std::copy_n(std::istreambuf_iterator<char>(response.File.file), response.File.size, std::back_inserter(raw));
 		}
 	}
