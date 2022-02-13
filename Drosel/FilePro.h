@@ -1,6 +1,7 @@
 #pragma once
 #include<unordered_map>
 #include<fstream>
+#include<filesystem>
 #include<optional>
 #include"Response.h"
 class FilePro
@@ -8,7 +9,7 @@ class FilePro
 private:
 	const static std::unordered_map<std::string, std::string> CONTENT_TYPES;
 public:
-	class ResponseT : virtual public Response
+	class ResponseT : public virtual Response
 	{
 	friend class FilePro;
 	private:
@@ -19,31 +20,21 @@ public:
 		};
 		FILE File;
 	private:
-		static std::optional<std::string> GetFileType(const std::string& file)
+		static std::optional<std::string> GetFileType(const std::filesystem::path& file)
 		{
-			std::string ext;
-			for (auto i = file.rbegin(); i < file.rend(); i++)
-			{
-				if (*i != '.')
-				{
-					ext = *i + ext;
-					continue;
-				}
-				break;
-			}
-			if (CONTENT_TYPES.find(ext) == CONTENT_TYPES.end())
+			auto fnd = CONTENT_TYPES.find(file.extension().string());
+			if (fnd == CONTENT_TYPES.end())
 			{
 				return {};
 			}
 			else
 			{
-				return CONTENT_TYPES.at(ext);
+				return fnd->second;
 			}
 		}
 	public:
 		void SendFile(const std::string& file)
 		{
-			
 			File.file.open(file, std::ios_base::binary);
 			if (File.file.good())
 			{
@@ -69,5 +60,6 @@ public:
 	}
 };
 const std::unordered_map<std::string, std::string> FilePro::CONTENT_TYPES = {
-	{"png" , "image/png"} , {"jpg" , "image/jpeg"} ,
-	{"ico" , "image/x-icon"},{"jpeg","image/jpeg"} };
+	{".png" , "image/png"} , {".jpg" , "image/jpeg"} ,
+	{".ico" , "image/x-icon"},{".jpeg","image/jpeg"} ,
+	{".mp4" , "video/mp4"} };
