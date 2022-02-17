@@ -4,6 +4,7 @@ class Request
 {
 public:
 	using u_map = std::unordered_map<std::string, std::string>;
+	u_map PATH_DATA;
 	u_map GET;
 	Header headers;
 	std::string ClientIP;

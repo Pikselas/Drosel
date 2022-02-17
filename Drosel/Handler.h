@@ -66,6 +66,7 @@ Handler<RequestT , ResponseT>::Handler(RequestT request , const std::vector<char
 		std::stringstream ss;
 		ss << Has_Body.value();
 		ss >> TOTAL_BODY;
+		request.BODY_SIZE = TOTAL_BODY;
 	}
 	std::function<int(int)> f = std::bind(&Handler::ReceiveData,this, std::placeholders::_1);
 	for (auto& engine : fwd_engines)

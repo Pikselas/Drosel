@@ -36,6 +36,9 @@
     <ClCompile Include="Parser.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="PathFrog.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="NetworkBuilder.h">
@@ -70,6 +73,12 @@
     </ClInclude>
     <ClInclude Include="FilePro.h">
       <Filter>Engines</Filter>
+    </ClInclude>
+    <ClInclude Include="LiveFiler.h">
+      <Filter>Engines</Filter>
+    </ClInclude>
+    <ClInclude Include="PathFrog.h">
+      <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>
