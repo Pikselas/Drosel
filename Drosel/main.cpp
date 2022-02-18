@@ -1,6 +1,3 @@
-#include<iostream>
-#include<fstream>
-#include<vector>
 #include"DroselServer.h"
 #include"PostParser.h"
 #include"FilePro.h"
@@ -22,13 +19,11 @@ int main()
 		ds.Use(LiveFiler{"D:/data"});
 		ds.Use(FilePro{});
 
-		ds.OnPath(PathFrog{ "/himawari/<img_name>" }, [](auto& req, auto& res) {
+		ds.OnPath(PathFrog{ "/mawari/<img_name>" }, [](auto& req, auto& res) {
 
-			res.SendFile("D:/USELESS/New_folder/Henta Data/himawar yrs/" + req.PATH_DATA["img_name"]);
-			
+			res.SendFile("C:/Users/Aritra Maji/OneDrive/Desktop/" + req.PATH_DATA["img_name"]);
+
 			});
-
-
 
 		ds.RunServer("3456");
 	}

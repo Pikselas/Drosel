@@ -13,12 +13,7 @@ public:
 	{
 	friend class FilePro;
 	private:
-		struct FILE
-		{
-			std::ifstream file;
-			size_t size = 0;
-		};
-		FILE File;
+		std::ifstream File;
 	private:
 		static std::optional<std::string> GetFileType(const std::filesystem::path& file)
 		{
@@ -35,15 +30,10 @@ public:
 	public:
 		void SendFile(const std::string& file)
 		{
-			File.file.open(file, std::ios_base::binary);
-			if (File.file.good())
+			if (std::filesystem::exists(file))
 			{
-				File.file.seekg(0, std::ios_base::end);
-				File.size = File.file.tellg();
-				File.file.seekg(0, std::ios_base::beg);
-				std::stringstream ss;
-				ss << File.size;
-				headers.AddHeader("Content-Length", ss.str());
+				File.open(file, std::ios_base::binary);
+				headers.AddHeader("Content-Length", std::to_string(std::filesystem::file_size(file)));
 				if (auto c_type = GetFileType(file))
 				{
 					headers.AddHeader("Content-Type", c_type.value());
@@ -53,13 +43,13 @@ public:
 	};
 	void operator()(ResponseT& response , std::vector<char>& raw)
 	{
-		if (response.File.size > 0)
+		if (response.File.is_open())
 		{
-			std::copy_n(std::istreambuf_iterator<char>(response.File.file), response.File.size, std::back_inserter(raw));
+			std::copy(std::istreambuf_iterator<char>(response.File) , std::istreambuf_iterator<char>{}, std::back_inserter(raw));
 		}
 	}
 };
 const std::unordered_map<std::string, std::string> FilePro::CONTENT_TYPES = {
 	{".png" , "image/png"} , {".jpg" , "image/jpeg"} ,
 	{".ico" , "image/x-icon"},{".jpeg","image/jpeg"} ,
-	{".mp4" , "video/mp4"} };
+	{".mp4" , "video/mp4"} , {".txt" , "text/plain"}};
