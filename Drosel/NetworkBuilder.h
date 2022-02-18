@@ -50,8 +50,8 @@ public:
 public:
 	bool IsConnected() const noexcept;
 	void ResizeReceiveBuffer(const int size) noexcept;
-    void Send(const std::string& data);
-	void Send(const char* DataBuffer, const int DataLen);
+    int Send(const std::string& data);
+	int Send(const char* DataBuffer, const int DataLen);
 	std::optional<std::string_view> Receive();
 	std::optional<std::pair<const char*,int>> Receive(int size);
 	void DisConnect() noexcept;

@@ -41,11 +41,18 @@ public:
 			}
 		}
 	};
-	void operator()(ResponseT& response , std::vector<char>& raw)
+	void operator()(ResponseT& response , std::vector<char>& raw , std::function<int(const char* , int)> f)
 	{
 		if (response.File.is_open())
 		{
-			std::copy(std::istreambuf_iterator<char>(response.File) , std::istreambuf_iterator<char>{}, std::back_inserter(raw));
+			char buff[1024];
+			while (response.File.good())
+			{
+				f(buff, response.File.read(buff, 1024).gcount());
+			}
+
+			//std::copy(std::istreambuf_iterator<char>(response.File) , std::istreambuf_iterator<char>{}, std::back_inserter(raw));
+			response.File.close();
 		}
 	}
 };

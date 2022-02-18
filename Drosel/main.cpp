@@ -21,7 +21,7 @@ int main()
 
 		ds.OnPath(PathFrog{ "/mawari/<img_name>" }, [](auto& req, auto& res) {
 
-			res.SendFile("C:/Users/Aritra Maji/OneDrive/Desktop/" + req.PATH_DATA["img_name"]);
+			res.SendFile("D:/server/htdocs/" + req.PATH_DATA["img_name"]);
 
 			});
 

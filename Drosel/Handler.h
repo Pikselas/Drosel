@@ -12,7 +12,7 @@ private:
 	bool moved = false;
 public:
 	typedef std::function<void(RequestT&, std::vector<char>&, std::function<int(int)>)> FWD_ENGINE_TYPE;
-	typedef std::function<void(ResponseT& , std::vector<char>&)> BCKWD_ENGINE_TYPE;
+	typedef std::function<void(ResponseT& , std::vector<char>& , std::function<int(const char* , int)>)> BCKWD_ENGINE_TYPE;
 private:
 	RequestT request;
 	ResponseT response;
@@ -95,15 +95,20 @@ Handler<RequestT,ResponseT>::~Handler()
 				BODY_RECEIVED += ob.value().second;
 			}
 		}
-		for (auto& engine : BCKWD_ENGINES)
-		{
-			engine(response, RAW_RESPONSE_DATA);
-		}
 		std::ostringstream ostr;
 		ostr << "HTTP/1.1 " << response.STATUS_CODE << " " << Response::STATUS_CODES.at(response.STATUS_CODE) << "\r\n";
 		ostr << response.headers.CounstructRaw();
 		ostr << "\r\n\r\n";
 		connection.Send(ostr.str());
+
+		using overloaded = int (NetworkBuilder::*)(const char*, int);
+		auto f = std::bind(static_cast<overloaded>(&NetworkBuilder::Send) , std::ref(connection) , std::placeholders::_1 , std::placeholders::_2);
+
+		for (auto& engine : BCKWD_ENGINES)
+		{
+			engine(response, RAW_RESPONSE_DATA , f);
+		}
+
 		size_t response_size = RAW_RESPONSE_DATA.size();
 		while (response_size > TRANSFERR_PER_CALL)
 		{

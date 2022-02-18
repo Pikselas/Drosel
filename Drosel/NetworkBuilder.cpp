@@ -68,17 +68,19 @@ void NetworkBuilder::ResizeReceiveBuffer(const int size) noexcept
 	RECV_BUFF = std::make_unique<char[]>(size);
 }
 
-void NetworkBuilder::Send(const std::string& data)
+int NetworkBuilder::Send(const std::string& data)
 {
-	Send(data.c_str(), (int) data.length());
+	return Send(data.c_str(), (int) data.length());
 }
 
-void NetworkBuilder::Send(const char* DataBuffer, const int DataLen)
+int NetworkBuilder::Send(const char* DataBuffer, const int DataLen)
 {
-	if (send(CONNECTION_SOCKET, DataBuffer , DataLen, 0) == SOCKET_ERROR)
+	int send_stat = send(CONNECTION_SOCKET, DataBuffer, DataLen, 0);
+	if (send_stat == SOCKET_ERROR)
 	{
 		ThrowException(WSAGetLastError());
 	}
+	return send_stat;
 }
 
 std::optional<std::string_view> NetworkBuilder::Receive()
