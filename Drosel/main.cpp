@@ -19,9 +19,9 @@ int main()
 		ds.Use(LiveFiler{"D:/data"});
 		ds.Use(FilePro{});
 
-		ds.OnPath(PathFrog{ "/mawari/<img_name>" }, [](auto& req, auto& res) {
+		ds.OnPath(PathFrog{"/home/<places...>"}, [](auto& req, auto& res) {
 
-			res.SendFile("D:/server/htdocs/" + req.PATH_DATA["img_name"]);
+			std::cout << req.PATH_DATA["places"] << std::endl;
 
 			});
 

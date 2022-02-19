@@ -9,48 +9,77 @@ PathFrog& PathFrog::operator=(const std::string& frog)
 {
 	PATH_COMPONENTS.clear();
 	KEY_LIST.clear();
+	size_t ACCEPT_V = 0;
 	for (auto& itm : ksTools::split_by_delms(frog, "/"))
 	{
 		if (itm.front() == '<' && itm.back() == '>')
 		{
-			KEY_LIST.emplace_back(itm.begin() + 1 , itm.end() - 1);
 			PATH_COMPONENTS.emplace_back();
+			if (
+				std::string{ std::clamp(itm.end() - 4 , itm.begin() , itm.end() - 1) , itm.end() - 1} == "..."
+				)
+			{
+				KEY_LIST.emplace_back(itm.begin() + 1, itm.end() - 4);
+				ACCEPTSALL_SET.insert(ACCEPT_V);
+			}
+			else
+			{
+				KEY_LIST.emplace_back(itm.begin() + 1, itm.end() - 1);
+			}
 		}
 		else
 		{
 			PATH_COMPONENTS.emplace_back(std::move(itm));
 		}
+		ACCEPT_V++;
 	}
 	return *this;
 }
 
 std::optional<std::unordered_map<std::string, std::string>> PathFrog::operator==(const std::vector<std::string> & pathcomp) const
 {
-	if (pathcomp.size() == PATH_COMPONENTS.size())
+	size_t key_pos = 0;
+	std::unordered_map<std::string, std::string> m;
+	bool PrevAcceptsAll = false;
+	for (size_t i = 0 , j = 0; i < pathcomp.size(); i++)
 	{
-		size_t key_pos = 0;
-		std::unordered_map<std::string, std::string> m;
-		for (auto i = 0; i < PATH_COMPONENTS.size(); i++)
+		if (PATH_COMPONENTS[j] == pathcomp[i])
 		{
-			if (PATH_COMPONENTS[i] != pathcomp[i])
+			if (PrevAcceptsAll)
 			{
-				if (PATH_COMPONENTS[i])
+				key_pos++;
+				PrevAcceptsAll = false;
+			}
+			j++;
+		}
+		else
+		{
+			if (!PATH_COMPONENTS[j])
+			{
+				if (ACCEPTSALL_SET.find(j) != ACCEPTSALL_SET.end())
 				{
-					return {};
+					m[KEY_LIST[key_pos]] +=  '/' + pathcomp[i];
+					PrevAcceptsAll = true;
 				}
 				else
 				{
+					PrevAcceptsAll = false;
 					m[KEY_LIST[key_pos]] = pathcomp[i];
 					key_pos++;
 				}
+				j = std::clamp(j + 1, (size_t)0, PATH_COMPONENTS.size() - 1);
+			}
+			else if (PrevAcceptsAll)
+			{
+				m[KEY_LIST[key_pos]] += '/' + pathcomp[i];
+			}
+			else
+			{
+				return {};
 			}
 		}
-		return m;
 	}
-	else
-	{
-		return{};
-	}
+	return m;
 }
 
 std::optional<std::unordered_map<std::string, std::string>> PathFrog::operator==(const std::string& path) const

@@ -2,9 +2,12 @@
 #include<unordered_map>
 #include<vector>
 #include<optional>
+#include<unordered_set>
 #include"KsXstr.hpp"
 class PathFrog
 {
+private:
+	std::unordered_set<size_t> ACCEPTSALL_SET;
 private:
 	std::vector<std::optional<std::string>> PATH_COMPONENTS;
 	std::vector<std::string> KEY_LIST;
