@@ -4,6 +4,7 @@ class Request
 {
 public:
 	using u_map = std::unordered_map<std::string, std::string>;
+	std::string PATH;
 	u_map PATH_DATA;
 	u_map GET;
 	Header headers;
@@ -12,7 +13,7 @@ public:
 	size_t BODY_SIZE = 0;
 public:
 	Request() = default;
-	Request(Header hdr) : headers(std::move(hdr)){}
+	Request(Header& hdr) : headers(std::move(hdr)){}
 	Request(Request&&) noexcept = default;
 	Request(const Request&) = default;
 };

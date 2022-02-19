@@ -63,7 +63,8 @@ std::unordered_map<std::string, std::string> Parser::ParsePathData()
 			auto Pos = evrElm.find("%20");
 			if (Pos != std::string::npos)
 			{
-				evrElm.erase(Pos, 3);
+				evrElm[Pos] = ' ';
+				evrElm.erase(Pos + 1, 2);
 			}
 			else
 			{
@@ -71,6 +72,8 @@ std::unordered_map<std::string, std::string> Parser::ParsePathData()
 			}
 		}
 		auto Obj = std::move(ksTools::split_by_delms(evrElm, "="));
+		ksTools::trim(Obj.front());
+		ksTools::trim(Obj.back());
 		GET_DATA[Obj.front()] = Obj.back();
 	}
 	return GET_DATA;
