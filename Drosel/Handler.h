@@ -69,9 +69,20 @@ Handler<RequestT , ResponseT>::Handler(RequestT request , const std::vector<char
 		request.BODY_SIZE = TOTAL_BODY;
 	}
 	std::function<int(int)> f = std::bind(&Handler::ReceiveData,this, std::placeholders::_1);
-	for (auto& engine : fwd_engines)
+	try
 	{
-		engine(this->request, RAW_REQUEST_DATA, f);
+		for (auto& engine : fwd_engines)
+		{
+			engine(this->request, RAW_REQUEST_DATA, f);
+		}
+	}
+	catch (const DroselException& de)
+	{
+
+	}
+	catch (const NetworkBuilder::Exception& e)
+	{
+
 	}
 }
 
@@ -88,34 +99,41 @@ Handler<RequestT,ResponseT>::~Handler()
 {
 	if (!moved)
 	{
-		while (BODY_RECEIVED < TOTAL_BODY)
+		try
 		{
-			if (auto ob = connection.Receive(TRANSFERR_PER_CALL))
+			while (BODY_RECEIVED < TOTAL_BODY)
 			{
-				BODY_RECEIVED += ob.value().second;
+				if (auto ob = connection.Receive(TRANSFERR_PER_CALL))
+				{
+					BODY_RECEIVED += ob.value().second;
+				}
 			}
+			std::ostringstream ostr;
+			ostr << "HTTP/1.1 " << response.STATUS_CODE << " " << Response::STATUS_CODES.at(response.STATUS_CODE) << "\r\n";
+			ostr << response.headers.CounstructRaw();
+			ostr << "\r\n\r\n";
+			connection.Send(ostr.str());
+
+			using overloaded = int (NetworkBuilder::*)(const char*, int);
+			auto f = std::bind(static_cast<overloaded>(&NetworkBuilder::Send), std::ref(connection), std::placeholders::_1, std::placeholders::_2);
+
+			for (auto& engine : BCKWD_ENGINES)
+			{
+				engine(response, RAW_RESPONSE_DATA, f);
+			}
+
+			size_t response_size = RAW_RESPONSE_DATA.size();
+			while (response_size > TRANSFERR_PER_CALL)
+			{
+				connection.Send(RAW_RESPONSE_DATA.data() + (RAW_RESPONSE_DATA.size() - response_size), TRANSFERR_PER_CALL);
+				response_size -= TRANSFERR_PER_CALL;
+			}
+			connection.Send(RAW_RESPONSE_DATA.data() + (RAW_RESPONSE_DATA.size() - response_size), response_size);
 		}
-		std::ostringstream ostr;
-		ostr << "HTTP/1.1 " << response.STATUS_CODE << " " << Response::STATUS_CODES.at(response.STATUS_CODE) << "\r\n";
-		ostr << response.headers.CounstructRaw();
-		ostr << "\r\n\r\n";
-		connection.Send(ostr.str());
-
-		using overloaded = int (NetworkBuilder::*)(const char*, int);
-		auto f = std::bind(static_cast<overloaded>(&NetworkBuilder::Send) , std::ref(connection) , std::placeholders::_1 , std::placeholders::_2);
-
-		for (auto& engine : BCKWD_ENGINES)
+		catch(const NetworkBuilder::Exception& e)
 		{
-			engine(response, RAW_RESPONSE_DATA , f);
-		}
 
-		size_t response_size = RAW_RESPONSE_DATA.size();
-		while (response_size > TRANSFERR_PER_CALL)
-		{
-			connection.Send(RAW_RESPONSE_DATA.data() + (RAW_RESPONSE_DATA.size() - response_size), TRANSFERR_PER_CALL);
-			response_size -= TRANSFERR_PER_CALL;
 		}
-		connection.Send(RAW_RESPONSE_DATA.data() + (RAW_RESPONSE_DATA.size() - response_size), response_size);
 	}
 }
 
@@ -124,7 +142,18 @@ void Handler<RequestT , ResponseT>::operator()(std::function<void(RequestT&, Res
 {
 	if (callable != nullptr)
 	{
-		callable(request, response);
+		try
+		{
+			callable(request, response);
+		}
+		catch (Response::ResponseException& re)
+		{
+
+		}
+		catch (const DroselException& de)
+		{
+
+		}
 	}
 	else
 	{

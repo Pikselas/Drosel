@@ -167,4 +167,10 @@ namespace ksTools
      s.erase(s.end() - 1);
      return s;
  }
+
+ inline void Replace_With(std::string& str , const std::string& replace_to , const std::string& replace_with)
+ {
+    
+ }
+
 }

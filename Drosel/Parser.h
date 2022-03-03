@@ -2,6 +2,7 @@
 #include<string>
 #include<vector>
 #include<unordered_map>
+#include<regex>
 #include"KsXstr.hpp"
 #include"Header.h"
 class Parser

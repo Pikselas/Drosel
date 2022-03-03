@@ -87,7 +87,8 @@ void DroselServer < RequestT, ResponseT>::RunServer(const std::string& port)
 
 		std::function<void(RequestT&, ResponseT&)> func = nullptr;
 
-		auto& path = request.PATH = HeadParser.ParsePath();
+		const auto& path = request.PATH = HeadParser.ParsePath();
+
 		auto itr = PATH_FUNCTIONS.find(path);
 		if (itr != PATH_FUNCTIONS.end())
 		{
@@ -108,7 +109,10 @@ void DroselServer < RequestT, ResponseT>::RunServer(const std::string& port)
 
 		Handler<RequestT, ResponseT>{
 										std::move(request),
-										{ HeadData.begin() + LastFindingPos + 4 , HeadData.end() },
+										{ 
+											std::clamp(HeadData.begin() + LastFindingPos + 4 , HeadData.begin() , HeadData.end()),
+											HeadData.end()
+										},
 											FWD_ENGINES,
 											BCKWD_ENGINES,
 											* server

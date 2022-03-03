@@ -143,6 +143,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="DroselException.cpp" />
     <ClCompile Include="Header.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="NetworkBuilder.cpp" />
@@ -152,6 +153,7 @@
     <ClCompile Include="Response.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="DroselException.h" />
     <ClInclude Include="DroselServer.h" />
     <ClInclude Include="FilePro.h" />
     <ClInclude Include="Handler.h" />

@@ -3,6 +3,7 @@
 #include"FilePro.h"
 #include"LiveFiler.h"
 #include"PathFrog.h"
+#include"DroselException.h"
 int main()
 {
 	try
@@ -19,21 +20,27 @@ int main()
 		ds.Use(LiveFiler{"D:/data"});
 		ds.Use(FilePro{});
 
-		ds.OnPath(PathFrog{"/home/<places...>"}, [](auto& req, auto& res) {
 
-			std::cout << req.PATH_DATA["places"] << std::endl;
+		ds.OnPath("/img.jpg", [](auto& req , auto& res ) {
+			
+			res.SendFile("D:/retro.jpg");
 
 			});
-
+		
+		
 		ds.RunServer("3456");
 	}
-	catch (const NetworkBuilder::Exception e)
+	catch (const NetworkBuilder::Exception& e)
 	{
-		std::cout<<e.what();
+		std::cerr<<e.what();
 	}
-	catch (const std::exception&)
+	catch (const DroselException& e)
 	{
-		std::cerr << "SOME EXCEPTION";
+		std::cout << e.get_details();
+	}
+	catch (const std::exception& e)
+	{
+		std::cerr << e.what();
 	}
 	return 0;
 }

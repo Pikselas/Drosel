@@ -39,6 +39,9 @@
     <ClCompile Include="PathFrog.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="DroselException.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="NetworkBuilder.h">
@@ -78,6 +81,9 @@
       <Filter>Engines</Filter>
     </ClInclude>
     <ClInclude Include="PathFrog.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="DroselException.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
