@@ -30,6 +30,7 @@ public:
 	public:
 		void SendFile(const std::string& file)
 		{
+			LockResponse();
 			if (std::filesystem::exists(file))
 			{
 				File.open(file, std::ios_base::binary);

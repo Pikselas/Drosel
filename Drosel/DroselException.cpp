@@ -24,9 +24,9 @@ const std::string& DroselException::get_file() const
 std::string DroselException::get_details() const
 {
 	std::stringstream ss;
-	ss  << "<h1>[DROSEL EXCEPTION]</h1>" << "<br/>"
-		<< "<h2>[LINE NO]</h2>" << LINE << "<br/>"
-		<< "<h2>[FILE NAME]</h2>" << FILE << "<br/>";
+	ss << "<h1>DROSEL EXCEPTION</h1><hr/>"
+		<< "<h2>[FILE NAME]</h2><h3>" << FILE << "</h3>"
+		<< "<h2>[LINE NO]</h2><h3>" << LINE << "</h3>";
 	return ss.str();
 }
 

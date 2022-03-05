@@ -111,8 +111,9 @@ Handler<RequestT,ResponseT>::~Handler()
 			std::ostringstream ostr;
 			ostr << "HTTP/1.1 " << response.STATUS_CODE << " " << Response::STATUS_CODES.at(response.STATUS_CODE) << "\r\n";
 			ostr << response.headers.CounstructRaw();
-			ostr << "\r\n\r\n";
+			ostr << "\r\n\r\n" << response.Get();
 			connection.Send(ostr.str());
+
 
 			using overloaded = int (NetworkBuilder::*)(const char*, int);
 			auto f = std::bind(static_cast<overloaded>(&NetworkBuilder::Send), std::ref(connection), std::placeholders::_1, std::placeholders::_2);
@@ -146,9 +147,10 @@ void Handler<RequestT , ResponseT>::operator()(std::function<void(RequestT&, Res
 		{
 			callable(request, response);
 		}
-		catch (Response::ResponseException& re)
+		catch (const Response::MultipleResponseException& mre)
 		{
-
+			response.Reset();
+			response.SendString(mre.get_details() + "<hr><h2><i>TRIED SENDING MULTIPLE RESPONSES<i></h2>");
 		}
 		catch (const DroselException& de)
 		{

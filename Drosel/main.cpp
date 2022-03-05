@@ -21,9 +21,10 @@ int main()
 		ds.Use(FilePro{});
 
 
-		ds.OnPath("/img.jpg", [](auto& req , auto& res ) {
+		ds.OnPath("/img", [](auto& req , auto& res ) 
+			{
 			
-			res.SendFile("D:/retro.jpg");
+			 res.SendString("Hello World");
 
 			});
 		

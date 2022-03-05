@@ -28,3 +28,8 @@ std::string Header::CounstructRaw() const
 	}
 	return tmp;
 }
+
+void Header::Reset()
+{
+	headers.clear();
+}
