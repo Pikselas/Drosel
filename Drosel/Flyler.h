@@ -4,15 +4,16 @@
 #include<filesystem>
 #include<functional>
 #include<iostream>
+#include<unordered_map>
 #include"Request.h"
-class LiveFiler
+class Flyler
 {
 private:
-	const std::string path;
+	std::string path;
 	public:
 	class RequestT : virtual public Request
 	{
-		friend class LiveFiler;
+		friend class Flyler;
 	private:
 		std::string storagePath;
 	public:
@@ -27,6 +28,7 @@ private:
 		using FILE_MAP_T = std::map<std::string, std::vector<FILE_TYPE>>;
 		 FILE_MAP_T FILES;
 	public:
+		std::unordered_map<std::string, std::string> POST;
 		const FILE_MAP_T& GetUploadedFiles() const
 		{
 			return FILES;
@@ -47,12 +49,52 @@ private:
 			}
 		}
 	};
+
 	void operator()(RequestT& request, std::vector<char>& raw, std::function<int(int)> fn)
 	{
 		request.storagePath = path + '/';
-
-
+		if (auto type = request.headers.GetHeader("Content-Type"))
+		{
+			if (type.value() != "application/x-www-form-urlencoded")
+			{
+				
+			}
+			else
+			{
+				while (fn(100));
+				std::string key;
+				std::string val;
+				bool GotKey = false;
+				for (auto c : raw)
+				{
+					if (c == '&')
+					{
+						GotKey = false;
+						request.POST[key] = std::move(val);
+						key.clear();
+					}
+					else if (c == '=')
+					{
+						GotKey = true;
+						request.POST[key];
+					}
+					else if(c != '\n' && c != '\r')
+					{
+						if (GotKey)
+						{
+							val += c;
+						}
+						else
+						{
+							key += c;
+						}
+					}
+				}
+				request.POST[key] = val;
+				raw.clear();
+			}
+		}
 	}
-	LiveFiler(const std::string& path) : path(std::filesystem::is_directory(path) ? path : "")
+	Flyler(const std::string& path = "") : path(std::filesystem::is_directory(path) ? path + '/' : "")
 	{}
 };

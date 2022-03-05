@@ -1,23 +1,20 @@
 #include"DroselServer.h"
-#include"PostParser.h"
 #include"FilePro.h"
-#include"LiveFiler.h"
+#include"Flyler.h"
 #include"PathFrog.h"
 #include"DroselException.h"
 int main()
 {
 	try
 	{
-		using ReqT = FinalType<	
-								PostParser::RequestT, 
-								LiveFiler::RequestT
+		using ReqT = FinalType<	 
+								Flyler::RequestT
 							  >;
 		using ResT = FilePro::ResponseT;
 		
 		DroselServer<ReqT , ResT> ds;
 
-		ds.Use(PostParser{});
-		ds.Use(LiveFiler{"D:/data"});
+		ds.Use(Flyler{});
 		ds.Use(FilePro{});
 
 
@@ -26,6 +23,19 @@ int main()
 			
 			 res.SendString("Hello World");
 
+			});
+
+
+		ds.OnPath("/posthere", [](auto& req , auto& res) {
+			
+			std::stringstream ss;
+			for (auto& [k, v] : req.POST)
+			{
+				ss << "<h2>" << k << "</h2>"
+					<< v << "<br/>";
+			}
+			res.SendString(ss.str());
+			
 			});
 		
 		

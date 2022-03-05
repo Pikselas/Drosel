@@ -71,13 +71,10 @@
     <ClInclude Include="Parser.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="PostParser.h">
-      <Filter>Engines</Filter>
-    </ClInclude>
     <ClInclude Include="FilePro.h">
       <Filter>Engines</Filter>
     </ClInclude>
-    <ClInclude Include="LiveFiler.h">
+    <ClInclude Include="Flyler.h">
       <Filter>Engines</Filter>
     </ClInclude>
     <ClInclude Include="PathFrog.h">

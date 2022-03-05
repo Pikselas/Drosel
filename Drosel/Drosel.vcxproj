@@ -159,12 +159,11 @@
     <ClInclude Include="Handler.h" />
     <ClInclude Include="Header.h" />
     <ClInclude Include="KsXstr.hpp" />
-    <ClInclude Include="LiveFiler.h" />
+    <ClInclude Include="Flyler.h" />
     <ClInclude Include="NetworkBuilder.h" />
     <ClInclude Include="NetworkServer.h" />
     <ClInclude Include="Parser.h" />
     <ClInclude Include="PathFrog.h" />
-    <ClInclude Include="PostParser.h" />
     <ClInclude Include="Request.h" />
     <ClInclude Include="Response.h" />
   </ItemGroup>
