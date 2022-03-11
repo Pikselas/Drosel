@@ -5,8 +5,9 @@
 #include<functional>
 #include<iostream>
 #include<unordered_map>
+#include<fstream>
 #include"Request.h"
-#include"kgenarals.h"
+#include"kgenerals.h"
 class Flyler
 {
 private:
@@ -103,19 +104,16 @@ private:
 
 					auto write_data = [&](auto start_itr , auto end_itr) 
 					{
-						if (start_itr != end_itr && current_writing_type == WRITING_TYPE::FILE_DATA)
-						{
-							std::cout << std::string_view(start_itr, end_itr - 1);
-						}
 
-						/*if (current_writing_type == WRITING_TYPE::FILE_DATA)
+						if (current_writing_type == WRITING_TYPE::FILE_DATA)
 						{
+							request.FILES[current_writing_name].back().SIZE += std::distance(start_itr, end_itr);
 							std::copy(start_itr, end_itr, std::ostreambuf_iterator(outfile));
 						}
 						else
 						{
 							std::copy(start_itr, end_itr, std::back_inserter(request.POST[current_writing_name]));
-						}*/
+						}
 					};
 
 					do
@@ -127,23 +125,34 @@ private:
 							{
 								if (*(boundary_pos + boundary.size()) != '-' && *(boundary_pos + boundary.size() + 1) != '-')
 								{
+									auto pos_from_search = ksTools::seek_itr_forward(boundary_pos, raw.end(), boundary.size() + 2);
+									auto Indx = std::distance(raw.begin(), boundary_pos);
 									while (true)
 									{
-										auto section_end_pos = std::search(ksTools::seek_itr_forward(boundary_pos , raw.end() , boundary.size() + 2), raw.end(),
-											end_of_section_str.begin(), end_of_section_str.end());
+										auto section_end_pos = std::search(pos_from_search, raw.end(),end_of_section_str.begin(), end_of_section_str.end());
 										if (section_end_pos != raw.end())
 										{
 											write_data(raw.begin(), ksTools::seek_itr_backward(raw.begin(), boundary_pos, 2));
 											
-											auto itemdtls = std::move(GetItemDetails({ boundary_pos + boundary.size() + 2 , section_end_pos }));
+											if (current_writing_type == WRITING_TYPE::FILE_DATA)
+											{
+												outfile.close();
+											}
 
-											if (itemdtls.find("filename") != itemdtls.end())
+											auto itemdtls = std::move(GetItemDetails({ boundary_pos + boundary.size() + 2 , section_end_pos }));
+											current_writing_name = itemdtls["name"];
+											auto is_file = itemdtls.find("filename");
+
+											if (is_file != itemdtls.end())
 											{
 												current_writing_type = WRITING_TYPE::FILE_DATA;
+												outfile.open( path + is_file->second, std::ios_base::binary);
+												request.FILES[current_writing_name].emplace_back(std::move(is_file->second), 0, itemdtls["type"], "" );
 											}
 											else
 											{
 												current_writing_type = WRITING_TYPE::POST_DATA;
+												request.POST[current_writing_name];
 											}
 
 											raw.erase(raw.begin(), section_end_pos + 4);
@@ -151,7 +160,15 @@ private:
 										}
 										else
 										{
-											fn(1024);
+											auto len = raw.size() - 5;
+											if (!fn(1024))
+											{
+												return;
+											}
+											// getting new iterator as if vector grows old one gets invalidated
+											boundary_pos = raw.begin() + Indx;
+											pos_from_search = raw.begin() + len;
+
 										}
 									}
 								}
@@ -210,6 +227,6 @@ private:
 		}
 	}
 	Flyler() = default;
-	Flyler(const std::optional<std::string>& path) : path(path ? (std::filesystem::is_directory(path.value()) ? path.value() : "./") : "./")
+	Flyler(const std::optional<std::string>& path) : path(path ? (std::filesystem::is_directory(path.value()) ? path.value() + '/' : "./") : "./")
 	{}
 };
