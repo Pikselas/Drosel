@@ -86,7 +86,7 @@
     <ClInclude Include="KsXstr.hpp">
       <Filter>kstools</Filter>
     </ClInclude>
-    <ClInclude Include="kgenarals.h">
+    <ClInclude Include="kgenerals.h">
       <Filter>kstools</Filter>
     </ClInclude>
   </ItemGroup>

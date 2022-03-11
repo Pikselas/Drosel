@@ -158,7 +158,7 @@
     <ClInclude Include="FilePro.h" />
     <ClInclude Include="Handler.h" />
     <ClInclude Include="Header.h" />
-    <ClInclude Include="kgenarals.h" />
+    <ClInclude Include="kgenerals.h" />
     <ClInclude Include="KsXstr.hpp" />
     <ClInclude Include="Flyler.h" />
     <ClInclude Include="NetworkBuilder.h" />
