@@ -4,6 +4,7 @@
 #include<optional>
 #include<unordered_set>
 #include"KsXstr.hpp"
+#include"kgenerals.h"
 class PathFrog
 {
 private:

@@ -38,7 +38,13 @@ int main()
 		res.SendFile("C:/Users/Aritra Maji/Videos/Drosel TEST.mp4");
 
 		});
-	
+
+	ds.OnPath(PathFrog{"/home/<name...>"}, [](auto& req, auto& res) {
+		
+		res.SendString(req.PATH_DATA["name"]);
+
+		});
+
 	ds.RunServer("3456");
 
 	return 0;

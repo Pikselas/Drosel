@@ -3,11 +3,11 @@
 #include<vector>
 #include<filesystem>
 #include<functional>
-#include<iostream>
 #include<unordered_map>
 #include<fstream>
 #include"Request.h"
 #include"kgenerals.h"
+#include"KsXstr.hpp"
 class Flyler
 {
 private:

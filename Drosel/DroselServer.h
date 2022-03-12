@@ -5,6 +5,7 @@
 #include"Handler.h"
 #include"NetworkServer.h"
 #include"KsXstr.hpp"
+#include"kgenerals.h"
 #include"Request.h"
 #include"Parser.h"
 #include"PathFrog.h"
@@ -109,14 +110,14 @@ void DroselServer < RequestT, ResponseT>::RunServer(const std::string& port)
 
 		Handler<RequestT, ResponseT>{
 										std::move(request),
-										{ 
-											std::clamp(HeadData.begin() + LastFindingPos + 4 , HeadData.begin() , HeadData.end()),
+										{
+											ksTools::seek_itr_forward(HeadData.begin() , HeadData.end() , LastFindingPos + 4),
 											HeadData.end()
 										},
 											FWD_ENGINES,
 											BCKWD_ENGINES,
 											* server
-									}(func);
+									 }(func);
 
 	}
 }

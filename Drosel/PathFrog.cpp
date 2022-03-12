@@ -16,7 +16,7 @@ PathFrog& PathFrog::operator=(const std::string& frog)
 		{
 			PATH_COMPONENTS.emplace_back();
 			if (
-				std::string{ std::clamp(itm.end() - 4 , itm.begin() , itm.end() - 1) , itm.end() - 1} == "..."
+				std::string{ ksTools::seek_itr_backward(itm.begin() , itm.end() , 4) , itm.end() -1 } == "..."
 				)
 			{
 				KEY_LIST.emplace_back(itm.begin() + 1, itm.end() - 4);
@@ -64,8 +64,15 @@ std::optional<std::unordered_map<std::string, std::string>> PathFrog::operator==
 				else
 				{
 					PrevAcceptsAll = false;
-					m[KEY_LIST[key_pos]] = pathcomp[i];
-					key_pos++;
+					if (key_pos < KEY_LIST.size())
+					{
+						m[KEY_LIST[key_pos]] = pathcomp[i];
+						key_pos++;
+					}
+					else
+					{
+						return {};
+					}
 				}
 				j = std::clamp(j + 1, (size_t)0, PATH_COMPONENTS.size() - 1);
 			}
@@ -79,7 +86,14 @@ std::optional<std::unordered_map<std::string, std::string>> PathFrog::operator==
 			}
 		}
 	}
-	return m;
+	if (m.size() == KEY_LIST.size())
+	{
+		return m;
+	}
+	else
+	{
+		return {};
+	}
 }
 
 std::optional<std::unordered_map<std::string, std::string>> PathFrog::operator==(const std::string& path) const

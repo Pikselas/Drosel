@@ -1,6 +1,5 @@
 #pragma once
 #include<iterator>
-#include<iostream>
 namespace ksTools
 {
 	inline auto seek_itr_forward(auto beg, auto end, size_t seek_by)
