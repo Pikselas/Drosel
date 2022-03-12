@@ -19,6 +19,9 @@
     <Filter Include="kstools">
       <UniqueIdentifier>{481128d1-e2ac-45f5-9e7c-b2e0178ab83d}</UniqueIdentifier>
     </Filter>
+    <Filter Include="App">
+      <UniqueIdentifier>{5c396cd6-c9de-4a55-a5b7-fe7e81b970fa}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="NetworkBuilder.cpp">
@@ -88,6 +91,12 @@
     </ClInclude>
     <ClInclude Include="kgenerals.h">
       <Filter>kstools</Filter>
+    </ClInclude>
+    <ClInclude Include="App.h">
+      <Filter>App</Filter>
+    </ClInclude>
+    <ClInclude Include="Globals.h">
+      <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

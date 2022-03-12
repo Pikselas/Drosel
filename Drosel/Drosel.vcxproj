@@ -156,8 +156,10 @@
     <ClInclude Include="DroselException.h" />
     <ClInclude Include="DroselServer.h" />
     <ClInclude Include="FilePro.h" />
+    <ClInclude Include="Globals.h" />
     <ClInclude Include="Handler.h" />
     <ClInclude Include="Header.h" />
+    <ClInclude Include="App.h" />
     <ClInclude Include="kgenerals.h" />
     <ClInclude Include="KsXstr.hpp" />
     <ClInclude Include="Flyler.h" />
