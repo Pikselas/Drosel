@@ -28,9 +28,9 @@ public:
 			}
 		}
 	public:
-		void SendFile(const std::string& file)
+		void SendFile(const std::string& file , std::source_location s = std::source_location::current())
 		{
-			LockResponse();
+			LockResponse(s);
 			if (std::filesystem::exists(file))
 			{
 				File.open(file, std::ios_base::binary);
