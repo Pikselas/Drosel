@@ -16,9 +16,16 @@ public:
 	PathFrog() = default;
 	PathFrog(const std::string& frog);
 	PathFrog(const PathFrog& pathfrog) = default;
+	PathFrog(PathFrog&&) noexcept  = default;
 public:
 	PathFrog& operator=(const PathFrog& pathfrog) = default;
+	PathFrog& operator=(PathFrog&&) noexcept = default;
 	PathFrog& operator=(const std::string& frog);
 	std::optional<std::unordered_map<std::string, std::string>> operator==(const std::vector<std::string>& pathcomp) const ;
 	std::optional<std::unordered_map<std::string, std::string>> operator==(const std::string& path) const ;
 };
+
+inline PathFrog operator ""_PF(const char* frog , size_t length)
+{
+	return PathFrog(frog);
+}
