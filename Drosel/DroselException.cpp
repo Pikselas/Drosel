@@ -3,7 +3,7 @@
 DroselException::DroselException(std::source_location s)
 {
 	LINE = std::to_string(s.line());
-	FILE = s.file_name();
+	FILE = std::filesystem::path(s.file_name()).filename().string();
 }
 
 const char* DroselException::what() const

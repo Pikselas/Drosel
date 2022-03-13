@@ -1,6 +1,7 @@
 #pragma once
 #include<string>
 #include<sstream>
+#include<filesystem>
 #include<exception>
 #include<source_location>
 class DroselException : public std::exception
