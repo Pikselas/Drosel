@@ -3,5 +3,10 @@
 
 DROSEL D
 {
-
+	{
+		"/" , [](ReqT& req , ResT& res)
+		{
+			
+		}
+	}
 };

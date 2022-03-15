@@ -7,24 +7,30 @@
 #include<fstream>
 #include"Request.h"
 #include"kgenerals.h"
+#include"UnID.h"
 #include"KsXstr.hpp"
 class Flyler
 {
 private:
 	std::string path = "./";
-	public:
+	UnID file_id;
+public:
 	class RequestT : virtual public Request
 	{
 		friend class Flyler;
 	private:
-		std::string storagePath;
+		static std::string storagePath;
 	public:
 		struct FILE_TYPE
 		{
 			std::string NAME;
 			size_t SIZE;
 			std::string TYPE;
-			std::string TEMP_NAME;
+			const std::string TEMP_NAME;
+			void SaveFile(std::string path ,std::optional<std::string> name = {}) const
+			{
+				std::filesystem::copy({ storagePath + TEMP_NAME },path + '/' + (name ? name.value() : NAME));
+			}
 		};
 	private:
 		using FILE_MAP_T = std::map<std::string, std::vector<FILE_TYPE>>;
@@ -45,7 +51,7 @@ private:
 					auto path = storagePath + file.TEMP_NAME;
 					if (fs::is_regular_file(path))
 					{
-						std::filesystem::remove(storagePath + file.TEMP_NAME);
+						std::filesystem::remove(path);
 					}
 				}
 			}
@@ -83,7 +89,6 @@ private:
 
 	void operator()(RequestT& request, std::vector<char>& raw, std::function<int(int)> fn)
 	{
-		request.storagePath = path;
 		if (auto type = request.headers.GetHeader("Content-Type"))
 		{
 			const auto& type_val = type.value();
@@ -145,9 +150,10 @@ private:
 
 											if (is_file != itemdtls.end())
 											{
+												auto ID = std::move(file_id());
 												current_writing_type = WRITING_TYPE::FILE_DATA;
-												outfile.open( path + is_file->second, std::ios_base::binary);
-												request.FILES[current_writing_name].emplace_back(std::move(is_file->second), 0, itemdtls["type"], "" );
+												outfile.open( path + ID, std::ios_base::binary);
+												request.FILES[current_writing_name].emplace_back(std::move(is_file->second), 0, itemdtls["type"], ID );
 											}
 											else
 											{
@@ -226,7 +232,11 @@ private:
 			}
 		}
 	}
-	Flyler() = default;
-	Flyler(const std::optional<std::string>& path) : path(path ? (std::filesystem::is_directory(path.value()) ? path.value() + '/' : "./") : "./")
-	{}
+	
+	Flyler(const std::optional<std::string>& path) : path(path ? (std::filesystem::is_directory(path.value()) ? path.value() + '/' : "./") : "./") , file_id{6}
+	{
+		RequestT::storagePath = path.value();
+	}
 };
+
+std::string Flyler::RequestT::storagePath;
