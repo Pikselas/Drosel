@@ -111,6 +111,7 @@ Handler<RequestT,ResponseT>::~Handler()
 			std::ostringstream ostr;
 			ostr << "HTTP/1.1 " << response.STATUS_CODE << " " << Response::STATUS_CODES.at(response.STATUS_CODE) << "\r\n";
 			ostr << response.headers.CounstructRaw();
+			ostr << response.ConstructRawCookies();
 			ostr << "\r\n\r\n" << response.Get();
 			connection.Send(ostr.str());
 

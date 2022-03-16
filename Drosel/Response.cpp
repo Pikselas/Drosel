@@ -25,12 +25,41 @@ void Response::SendString(const std::string& str)
 	response = str;
 }
 
+void Response::SetCookie(const std::string& name, const std::string& value, std::optional<std::string> path, std::optional<std::string> domain, bool httponly)
+{
+	std::string cookie_string = name + '=' + value + ';';
+	if (path)
+	{
+		cookie_string += "path=" + path.value() + ';';
+	}
+	if (domain)
+	{
+		cookie_string += "domain=" + domain.value() + ';';
+	}
+	if (httponly)
+	{
+		cookie_string += "HttpOnly";
+	}
+	cookies.emplace_back(std::move(cookie_string));
+}
+
+std::string Response::ConstructRawCookies() const
+{
+	std::string raw;
+	for (auto& cookie : cookies)
+	{
+		raw += "Set-Cookie:" + cookie + "\r\n";
+	}
+	return raw;
+}
+
 void Response::Reset()
 {
 	headers.Reset();
 	STATUS_CODE = 200;
 	FINAL_RESPONSE = false;
 	response.clear();
+	cookies.clear();
 }
 
 std::string Response::Get() const
