@@ -6,8 +6,7 @@ DROSEL D
 	{
 		"/" , [](ReqT& req , ResT& res)
 		{
-			res.SetCookie("aritra","maji");
-			res.SetCookie("japan", "hello", "/", "localhost");
+			res.SetCookie("aritra","maji" , Current_Time() + 60 * 60 * 24);
 		}
 	}
 };

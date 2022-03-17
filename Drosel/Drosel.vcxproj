@@ -155,6 +155,7 @@
   <ItemGroup>
     <ClInclude Include="DroselException.h" />
     <ClInclude Include="DroselServer.h" />
+    <ClInclude Include="DroselTime.h" />
     <ClInclude Include="FilePro.h" />
     <ClInclude Include="Globals.h" />
     <ClInclude Include="Handler.h" />

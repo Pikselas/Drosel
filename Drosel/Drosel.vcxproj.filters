@@ -101,5 +101,8 @@
     <ClInclude Include="UnID.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="DroselTime.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>

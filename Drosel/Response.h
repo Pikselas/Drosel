@@ -2,6 +2,7 @@
 #include<functional>
 #include<list>
 #include"Header.h"
+#include"DroselTime.h"
 #include"DroselException.h"
 class Response
 {
@@ -25,7 +26,7 @@ protected:
 	void LockResponse(std::source_location s = std::source_location::current());
 public:
 	void SendString(const std::string& str);
-	void SetCookie(const std::string& name, const std::string& value, std::optional<std::string> path = {}, std::optional<std::string> domain = {} , bool httponly = false);
+	void SetCookie(const std::string& name, const std::string& value, std::optional<std::time_t> expires = {}, std::optional<std::string> path = {}, std::optional<std::string> domain = {}, bool httponly = false);
 	virtual void Reset();
 	std::string Get() const;
 	std::string ConstructRawCookies() const;

@@ -25,9 +25,13 @@ void Response::SendString(const std::string& str)
 	response = str;
 }
 
-void Response::SetCookie(const std::string& name, const std::string& value, std::optional<std::string> path, std::optional<std::string> domain, bool httponly)
+void Response::SetCookie(const std::string& name, const std::string& value,std::optional<std::time_t> expires ,std::optional<std::string> path, std::optional<std::string> domain, bool httponly)
 {
 	std::string cookie_string = name + '=' + value + ';';
+	if (expires)
+	{
+		cookie_string += "expires=" + To_Complete_Date(expires.value());
+	}
 	if (path)
 	{
 		cookie_string += "path=" + path.value() + ';';
