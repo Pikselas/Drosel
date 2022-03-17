@@ -153,6 +153,7 @@
     <ClCompile Include="Response.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="CookieParser.h" />
     <ClInclude Include="DroselException.h" />
     <ClInclude Include="DroselServer.h" />
     <ClInclude Include="DroselTime.h" />

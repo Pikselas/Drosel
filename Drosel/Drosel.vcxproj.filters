@@ -104,5 +104,8 @@
     <ClInclude Include="DroselTime.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="CookieParser.h">
+      <Filter>Engines</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>

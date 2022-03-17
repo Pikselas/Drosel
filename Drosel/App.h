@@ -1,12 +1,19 @@
 #pragma once
 #include"Globals.h"
 
-DROSEL D
+std::initializer_list<PATH_FUNC_T> REGISTERED_FUNCS
 {
-	{
-		"/" , [](ReqT& req , ResT& res)
+	{"/" , 
+		[](auto& req , auto& res) 
 		{
-			res.SetCookie("aritra","maji" , Current_Time() + 60 * 60 * 24);
+			res.SendString("HELLO WORLD");
+		}
+	},
+
+	{"/home/<name>"_PF , 
+		[](ReqT& req , ResT& res)
+		{
+			res.SendString(req.COOKIES["hi"]);
 		}
 	}
 };
