@@ -13,7 +13,7 @@ std::initializer_list<PATH_FUNC_T> REGISTERED_FUNCS
 	{"/home/<name>"_PF , 
 		[](ReqT& req , ResT& res)
 		{
-			res.SendString(req.COOKIES["hi"]);
+			res.SendString("Hello " + req.PATH_DATA["name"]);
 		}
 	}
 };
