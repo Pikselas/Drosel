@@ -60,7 +60,7 @@ inline time_session set_interval(int ms, std::function<void()> f)
         bool Cont = false;
         while (*s_ptr)
         {
-            std::this_thread::sleep_for(std::chrono::microseconds(time_gap));
+            std::this_thread::sleep_for(std::chrono::milliseconds(time_gap));
             func();
         }
     };
