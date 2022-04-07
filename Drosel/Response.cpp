@@ -70,3 +70,10 @@ std::string Response::Get() const
 {
 	return response;
 }
+
+const std::string Response::MultipleResponseException::what_happend = "TRIED SENDING MULTIPLE RESPONSES";
+
+const char* Response::MultipleResponseException::what() const
+{
+	return what_happend.c_str();
+}

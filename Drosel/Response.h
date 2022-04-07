@@ -19,8 +19,10 @@ public:
 public:
 	class MultipleResponseException : public DroselException
 	{
+	   static const std::string what_happend;
 	public:
 		MultipleResponseException(std::source_location s = std::source_location::current()) : DroselException(s) {};
+		const char* what() const override;
 	};
 protected:
 	void LockResponse(std::source_location s = std::source_location::current());

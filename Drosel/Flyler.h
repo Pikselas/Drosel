@@ -89,147 +89,160 @@ public:
 
 	void operator()(RequestT& request, std::vector<char>& raw, std::function<int(int)> fn)
 	{
-		if (auto type = request.headers.GetHeader("Content-Type"))
+		try
 		{
-			const auto& type_val = type.value();
-			if (type_val.find("multipart/form-data") != std::string::npos)
+			if (auto type = request.headers.GetHeader("Content-Type"))
 			{
-				auto boundary_start = type_val.find("boundary");
-				if (boundary_start != std::string::npos)
+				const auto& type_val = type.value();
+				if (type_val.find("multipart/form-data") != std::string::npos)
 				{
-					std::string boundary(type_val.begin() + boundary_start + 8, type_val.end());
-					std::erase_if(boundary, [](char c) {return c == '='; });
-					ksTools::trim(boundary);
-
-					WRITING_TYPE current_writing_type = WRITING_TYPE::NONE;
-					std::string current_writing_name;
-					std::ofstream outfile;
-
-					std::string end_of_section_str("\r\n\r\n");
-
-					auto write_data = [&](auto start_itr , auto end_itr) 
+					auto boundary_start = type_val.find("boundary");
+					if (boundary_start != std::string::npos)
 					{
+						std::string boundary(type_val.begin() + boundary_start + 8, type_val.end());
+						std::erase_if(boundary, [](char c) {return c == '='; });
+						ksTools::trim(boundary);
 
-						if (current_writing_type == WRITING_TYPE::FILE_DATA)
-						{
-							request.FILES[current_writing_name].back().SIZE += std::distance(start_itr, end_itr);
-							std::copy(start_itr, end_itr, std::ostreambuf_iterator(outfile));
-						}
-						else
-						{
-							std::copy(start_itr, end_itr, std::back_inserter(request.POST[current_writing_name]));
-						}
-					};
+						WRITING_TYPE current_writing_type = WRITING_TYPE::NONE;
+						std::string current_writing_name;
+						std::ofstream outfile;
 
-					do
-					{
-						while (true)
+						std::string end_of_section_str("\r\n\r\n");
+
+						auto write_data = [&](auto start_itr, auto end_itr)
 						{
-							auto boundary_pos = std::search(raw.begin(), raw.end(), boundary.begin(), boundary.end());
-							if (boundary_pos != raw.end())
+
+							if (current_writing_type == WRITING_TYPE::FILE_DATA)
 							{
-								if (*(boundary_pos + boundary.size()) != '-' && *(boundary_pos + boundary.size() + 1) != '-')
+								request.FILES[current_writing_name].back().SIZE += std::distance(start_itr, end_itr);
+								std::copy(start_itr, end_itr, std::ostreambuf_iterator(outfile));
+							}
+							else
+							{
+								std::copy(start_itr, end_itr, std::back_inserter(request.POST[current_writing_name]));
+							}
+						};
+
+						do
+						{
+							while (true)
+							{
+								auto boundary_pos = std::search(raw.begin(), raw.end(), boundary.begin(), boundary.end());
+								if (boundary_pos != raw.end())
 								{
-									auto pos_from_search = ksTools::seek_itr_forward(boundary_pos, raw.end(), boundary.size() + 2);
-									auto Indx = std::distance(raw.begin(), boundary_pos);
-									while (true)
+									if (*(boundary_pos + boundary.size()) != '-' && *(boundary_pos + boundary.size() + 1) != '-')
 									{
-										auto section_end_pos = std::search(pos_from_search, raw.end(),end_of_section_str.begin(), end_of_section_str.end());
-										if (section_end_pos != raw.end())
+										auto pos_from_search = ksTools::seek_itr_forward(boundary_pos, raw.end(), boundary.size() + 2);
+										auto Indx = std::distance(raw.begin(), boundary_pos);
+										while (true)
 										{
-											write_data(raw.begin(), ksTools::seek_itr_backward(raw.begin(), boundary_pos, 2));
-											
-											if (current_writing_type == WRITING_TYPE::FILE_DATA)
+											auto section_end_pos = std::search(pos_from_search, raw.end(), end_of_section_str.begin(), end_of_section_str.end());
+											if (section_end_pos != raw.end())
 											{
-												outfile.close();
-											}
+												write_data(raw.begin(), ksTools::seek_itr_backward(raw.begin(), boundary_pos, 2));
 
-											auto itemdtls = std::move(GetItemDetails({ boundary_pos + boundary.size() + 2 , section_end_pos }));
-											current_writing_name = itemdtls["name"];
-											auto is_file = itemdtls.find("filename");
+												if (current_writing_type == WRITING_TYPE::FILE_DATA)
+												{
+													outfile.close();
+												}
 
-											if (is_file != itemdtls.end())
-											{
-												auto ID = std::move(file_id());
-												current_writing_type = WRITING_TYPE::FILE_DATA;
-												outfile.open( path + ID, std::ios_base::binary);
-												request.FILES[current_writing_name].emplace_back(std::move(is_file->second), 0, itemdtls["type"], ID );
+												auto itemdtls = std::move(GetItemDetails({ boundary_pos + boundary.size() + 2 , section_end_pos }));
+												current_writing_name = itemdtls["name"];
+												auto is_file = itemdtls.find("filename");
+
+												if (is_file != itemdtls.end())
+												{
+													auto ID = std::move(file_id());
+													current_writing_type = WRITING_TYPE::FILE_DATA;
+													outfile.open(path + ID, std::ios_base::binary);
+													request.FILES[current_writing_name].emplace_back(std::move(is_file->second), 0, itemdtls["type"], ID);
+												}
+												else
+												{
+													current_writing_type = WRITING_TYPE::POST_DATA;
+													request.POST[current_writing_name];
+												}
+
+												raw.erase(raw.begin(), section_end_pos + 4);
+												break;
 											}
 											else
 											{
-												current_writing_type = WRITING_TYPE::POST_DATA;
-												request.POST[current_writing_name];
-											}
+												auto len = raw.size() - 5;
+												if (!fn(1024))
+												{
+													return;
+												}
+												// getting new iterator as if vector grows old one gets invalidated
+												boundary_pos = raw.begin() + Indx;
+												pos_from_search = raw.begin() + len;
 
-											raw.erase(raw.begin(), section_end_pos + 4);
-											break;
-										}
-										else
-										{
-											auto len = raw.size() - 5;
-											if (!fn(1024))
-											{
-												return;
 											}
-											// getting new iterator as if vector grows old one gets invalidated
-											boundary_pos = raw.begin() + Indx;
-											pos_from_search = raw.begin() + len;
-
 										}
+									}
+									else
+									{
+										write_data(raw.begin(), ksTools::seek_itr_backward(raw.begin(), boundary_pos, 2));
+										return;
 									}
 								}
 								else
 								{
-									write_data(raw.begin(), ksTools::seek_itr_backward(raw.begin(), boundary_pos, 2));
-									return;
+									auto end_itr = ksTools::seek_itr_backward(raw.begin(), raw.end(), boundary.size());
+									write_data(raw.begin(), end_itr);
+									raw.erase(raw.begin(), end_itr);
+									break;
 								}
+							}
+						} while (fn(1024));
+					}
+				}
+				else
+				{
+					while (fn(100));
+					std::string key;
+					std::string val;
+					bool GotKey = false;
+					for (auto c : raw)
+					{
+						if (c == '&')
+						{
+							GotKey = false;
+							request.POST[key] = std::move(val);
+							key.clear();
+						}
+						else if (c == '=')
+						{
+							GotKey = true;
+							request.POST[key];
+						}
+						else if (c != '\n' && c != '\r')
+						{
+							if (GotKey)
+							{
+								val += c;
 							}
 							else
 							{
-								auto end_itr = ksTools::seek_itr_backward(raw.begin(), raw.end(), boundary.size());
-								write_data(raw.begin() , end_itr);
-								raw.erase(raw.begin(), end_itr);
-								break;
+								key += c;
 							}
 						}
-					} 
-					while (fn(1024));
+					}
+					request.POST[key] = val;
+					raw.clear();
 				}
 			}
-			else
+		}
+		catch (NetworkBuilder::Exception e)
+		{
+			for (const auto& fls : request.FILES)
 			{
-				while (fn(100));
-				std::string key;
-				std::string val;
-				bool GotKey = false;
-				for (auto c : raw)
+				for (const auto& fl : fls.second)
 				{
-					if (c == '&')
-					{
-						GotKey = false;
-						request.POST[key] = std::move(val);
-						key.clear();
-					}
-					else if (c == '=')
-					{
-						GotKey = true;
-						request.POST[key];
-					}
-					else if(c != '\n' && c != '\r')
-					{
-						if (GotKey)
-						{
-							val += c;
-						}
-						else
-						{
-							key += c;
-						}
-					}
+					std::filesystem::remove(path + fl.TEMP_NAME);
 				}
-				request.POST[key] = val;
-				raw.clear();
 			}
+			throw e;
 		}
 	}
 	

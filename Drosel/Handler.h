@@ -10,6 +10,7 @@ class Handler
 {
 private:
 	bool moved = false;
+	bool call_functions = true;
 public:
 	typedef std::function<void(RequestT&, std::vector<char>&, std::function<int(int)>)> FWD_ENGINE_TYPE;
 	typedef std::function<void(ResponseT& , std::vector<char>& , std::function<int(const char* , int)>)> BCKWD_ENGINE_TYPE;
@@ -78,11 +79,11 @@ Handler<RequestT , ResponseT>::Handler(RequestT request , const std::vector<char
 	}
 	catch (const DroselException& de)
 	{
-
+		call_functions = false;
 	}
 	catch (const NetworkBuilder::Exception& e)
 	{
-
+		call_functions = false;
 	}
 }
 
@@ -142,20 +143,16 @@ Handler<RequestT,ResponseT>::~Handler()
 template<class RequestT, class ResponseT>
 void Handler<RequestT , ResponseT>::operator()(std::function<void(RequestT&, ResponseT&)> callable)
 {
-	if (callable != nullptr)
+	if (callable != nullptr && call_functions)
 	{
 		try
 		{
 			callable(request, response);
 		}
-		catch (const Response::MultipleResponseException& mre)
-		{
-			response.Reset();
-			response.SendString(mre.get_details() + "<hr><h2><i>TRIED SENDING MULTIPLE RESPONSES<i></h2>");
-		}
 		catch (const DroselException& de)
 		{
-
+			response.Reset();
+			response.SendString(de.get_details() + "<hr><h2>" + de.what() + "</h2>");
 		}
 	}
 	else

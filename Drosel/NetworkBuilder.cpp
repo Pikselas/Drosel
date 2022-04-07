@@ -90,13 +90,10 @@ std::optional<std::string_view> NetworkBuilder::Receive()
 	{
 		return std::string_view(RECV_BUFF.get(), Res);
 	}
-	else if (Res == SOCKET_ERROR)
-	{
-		ThrowException(WSAGetLastError());
-	}
 	else
 	{
 		HasConnection = false;
+		ThrowException(WSAGetLastError());
 	}
 	return {};
 }
@@ -112,13 +109,10 @@ std::optional<std::pair<const char*,int>> NetworkBuilder::Receive(int size)
 	{
 		return std::make_pair(RECV_BUFF.get(), Res);
 	}
-	else if (Res == SOCKET_ERROR)
-	{
-		ThrowException(WSAGetLastError());
-	}
 	else
 	{
-		HasConnection = false;
+		HasConnection = true;
+		ThrowException(WSAGetLastError());
 	}
 	return {};
 }
