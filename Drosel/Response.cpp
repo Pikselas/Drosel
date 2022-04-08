@@ -6,7 +6,7 @@ const std::unordered_map<int, std::string> Response::STATUS_CODES {
 	{301 , "Temporary Redirect"} 
 };
 
-void Response::LockResponse(std::source_location s)
+void Response::LockResponse(source s)
 {
 	if (!FINAL_RESPONSE)
 	{
@@ -18,9 +18,9 @@ void Response::LockResponse(std::source_location s)
 	}
 }
 
-void Response::SendString(const std::string& str)
+void Response::SendString(const std::string& str , source s)
 {
-	LockResponse();
+	LockResponse(s);
 	headers.AddHeader("Content-Length", std::to_string(str.length()));
 	response = str;
 }

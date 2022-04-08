@@ -28,7 +28,7 @@ public:
 			}
 		}
 	public:
-		void SendFile(const std::string& file , std::source_location s = std::source_location::current())
+		void SendFile(const std::string& file , source s = source::current())
 		{
 			LockResponse(s);
 			if (std::filesystem::exists(file))

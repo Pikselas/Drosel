@@ -21,13 +21,13 @@ public:
 	{
 	   static const std::string what_happend;
 	public:
-		MultipleResponseException(std::source_location s = std::source_location::current()) : DroselException(s) {};
+		MultipleResponseException(source s = source::current()) : DroselException(s) {};
 		const char* what() const override;
 	};
 protected:
-	void LockResponse(std::source_location s = std::source_location::current());
+	void LockResponse(source s = source::current());
 public:
-	void SendString(const std::string& str);
+	void SendString(const std::string& str , source s = source::current());
 	void SetCookie(const std::string& name, const std::string& value, std::optional<std::time_t> expires = {}, std::optional<std::string> path = {}, std::optional<std::string> domain = {}, bool httponly = false);
 	virtual void Reset();
 	std::string Get() const;

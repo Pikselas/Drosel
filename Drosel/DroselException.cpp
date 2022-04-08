@@ -1,6 +1,6 @@
 #include"DroselException.h"
 
-DroselException::DroselException(std::source_location s)
+DroselException::DroselException(source s)
 {
 	LINE = std::to_string(s.line());
 	FILE = std::filesystem::path(s.file_name()).filename().string();

@@ -4,13 +4,16 @@
 #include<filesystem>
 #include<exception>
 #include<source_location>
+
+using source = std::source_location;
+
 class DroselException : public std::exception
 {
 private:
 	std::string LINE;
 	std::string FILE;
 public:
-	DroselException(std::source_location s = std::source_location::current());
+	DroselException(source s = source::current());
 public:
 	virtual const char* what() const override;
 	const std::string& get_line() const;
