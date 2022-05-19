@@ -10,7 +10,7 @@
 #include"Parser.h"
 #include"PathFrog.h"
 
-template<class RequestT  = Request, class ResponseT = Response>
+template<DerivedFromRequest RequestT = Request, DerivedFromResponse ResponseT = Response>
 class DroselServer
 {
 private:
@@ -28,31 +28,31 @@ public:
 };
 
 
-template<class RequestT, class ResponseT>
+template<DerivedFromRequest RequestT, DerivedFromResponse ResponseT>
 void DroselServer<RequestT, ResponseT>::OnPath(const std::string& path, std::function<void(RequestT&, ResponseT&)> path_function)
 {
 	PATH_FUNCTIONS[path] = path_function;
 }
 
-template<class RequestT, class ResponseT>
+template<DerivedFromRequest RequestT, DerivedFromResponse ResponseT>
 void DroselServer<RequestT, ResponseT>::OnPath(const PathFrog& pathfrog, std::function<void(RequestT&, ResponseT&)> frog_function)
 {
 	FROGGED_FUNCTIONS.emplace_back(pathfrog, frog_function);
 }
 
-template<class RequestT, class ResponseT>
+template<DerivedFromRequest RequestT, DerivedFromResponse ResponseT>
 void DroselServer<RequestT, ResponseT>::Use(Handler<RequestT, ResponseT>::FWD_ENGINE_TYPE engine)
 {
 	FWD_ENGINES.emplace_back(engine);
 }
 
-template<class RequestT, class ResponseT>
+template<DerivedFromRequest RequestT, DerivedFromResponse ResponseT>
 void DroselServer<RequestT, ResponseT>::Use(Handler<RequestT, ResponseT>::BCKWD_ENGINE_TYPE engine)
 {
 	BCKWD_ENGINES.emplace_back(engine);
 }
 
-template<class RequestT, class ResponseT>
+template<DerivedFromRequest RequestT, DerivedFromResponse ResponseT>
 void DroselServer < RequestT, ResponseT>::RunServer(const std::string& port)
 {
 	server = std::make_unique<NetworkServer>(port);
@@ -80,7 +80,7 @@ void DroselServer < RequestT, ResponseT>::RunServer(const std::string& port)
 
 		Parser HeadParser(HeadData.cbegin(), HeadData.cbegin() + LastFindingPos - 1);
 
-		RequestT request;
+		RequestT request = {};
 		request.METHOD = HeadParser.ParseRequestMethod();
 		request.headers = std::move(HeadParser.ParseHeaders());
 		request.ClientIP = server->GetClientIP();

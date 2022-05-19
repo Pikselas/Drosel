@@ -5,7 +5,14 @@
 #include<functional>
 #include<sstream>
 #include<vector>
-template<class RequestT , class ResponseT>
+
+template<class Type>
+concept DerivedFromRequest = std::is_base_of_v<Request, Type>;
+
+template<class Type>
+concept DerivedFromResponse = std::is_base_of_v<Response, Type>;
+
+template<DerivedFromRequest RequestT, DerivedFromResponse ResponseT>
 class Handler
 {
 public:
@@ -33,7 +40,7 @@ public:
 	void operator()(std::function<void(RequestT&, ResponseT&)> callable = nullptr);
 };
 
-template<class RequestT, class ResponseT>
+template<DerivedFromRequest RequestT, DerivedFromResponse ResponseT>
 int Handler<RequestT, ResponseT>::ReceiveData(int size)
 {
 	if (BODY_RECEIVED < TOTAL_BODY)
@@ -52,7 +59,7 @@ int Handler<RequestT, ResponseT>::ReceiveData(int size)
 	return 0;
 }
 
-template<class RequestT, class ResponseT>
+template<DerivedFromRequest RequestT, DerivedFromResponse ResponseT>
 Handler<RequestT , ResponseT>::Handler(RequestT request , const std::vector<char>& body , const std::vector<FWD_ENGINE_TYPE>& fwd_engines , const std::vector<BCKWD_ENGINE_TYPE>& bckwd_engines, NetworkBuilder& conn)
 	: 
  request(std::move(request)), RAW_REQUEST_DATA(std::move(body)) , FWD_ENGINES(fwd_engines), BCKWD_ENGINES(bckwd_engines), connection(std::move(conn))
@@ -68,7 +75,7 @@ Handler<RequestT , ResponseT>::Handler(RequestT request , const std::vector<char
 }
 
 
-template<class RequestT, class ResponseT>
+template<DerivedFromRequest RequestT, DerivedFromResponse ResponseT>
 void Handler<RequestT , ResponseT>::operator()(std::function<void(RequestT&, ResponseT&)> callable)
 {
 
