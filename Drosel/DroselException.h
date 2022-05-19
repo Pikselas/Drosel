@@ -12,6 +12,8 @@ class DroselException : public std::exception
 private:
 	std::string LINE;
 	std::string FILE;
+protected:
+	std::string WHAT_BUFFER;
 public:
 	DroselException(source s = source::current());
 public:

@@ -4,10 +4,20 @@
 #include<filesystem>
 #include<optional>
 #include"Response.h"
+#include"DroselException.h"
 class FilePro
 {
 private:
 	const static std::unordered_map<std::string, std::string> CONTENT_TYPES;
+public:
+	class FileNotFoundException : public DroselException
+	{
+	public:
+		FileNotFoundException(source s = source::current()) : DroselException(s) 
+		{
+			WHAT_BUFFER = "FILE NOT FOUND ON THIS LOCATION";
+		}
+	};
 public:
 	class ResponseT : public virtual Response
 	{
@@ -39,6 +49,10 @@ public:
 				{
 					headers.AddHeader("Content-Type", c_type.value());
 				}
+			}
+			else
+			{
+				throw FileNotFoundException{s};
 			}
 		}
 	};

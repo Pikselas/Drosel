@@ -8,7 +8,7 @@ DroselException::DroselException(source s)
 
 const char* DroselException::what() const
 {
-	return "DROSEL EXCEPTION";
+	return WHAT_BUFFER.c_str();
 }
 
 const std::string& DroselException::get_line() const
