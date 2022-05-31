@@ -30,7 +30,7 @@ NetworkBuilder::NetworkBuilder(NetworkBuilder&& nb) noexcept
 	HasConnection = nb.HasConnection;
 	ResizeReceiveBuffer(nb.RECEIVE_BUFF_SIZE);
 	nb.CONNECTION_SOCKET = INVALID_SOCKET;
-	HasConnection = false;
+	nb.HasConnection = false;
 }
 std::vector<std::string> NetworkBuilder::GetDeviceIPs()
 {

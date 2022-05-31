@@ -74,4 +74,5 @@ public:
 const std::unordered_map<std::string, std::string> FilePro::CONTENT_TYPES = {
 	{".png" , "image/png"} , {".jpg" , "image/jpeg"} ,
 	{".ico" , "image/x-icon"},{".jpeg","image/jpeg"} ,
-	{".mp4" , "video/mp4"} , {".txt" , "text/plain"}};
+	{".mp4" , "video/mp4"} , {".txt" , "text/plain"},
+	{".html" , "text/html"}};

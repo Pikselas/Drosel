@@ -107,7 +107,7 @@ void DroselServer < RequestT, ResponseT>::RunServer(const std::string& port)
 				}
 			}
 		}
-
+		std::thread(
 		Handler<RequestT, ResponseT>{
 										std::move(request),
 										{
@@ -116,8 +116,8 @@ void DroselServer < RequestT, ResponseT>::RunServer(const std::string& port)
 										},
 											FWD_ENGINES,
 											BCKWD_ENGINES,
-											* server
-									 }(func);
+											*server
+									 },func).detach();
 
 	}
 }
