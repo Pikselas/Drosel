@@ -7,7 +7,7 @@ std::initializer_list<PATH_FUNC_T> REGISTERED_FUNCS
 	{"/" , 
 		[](auto& req , auto& res) 
 		{
-			res.SendFile("C:/Users/Aritra Maji/Downloads/k.avi");
+			res.SendFile("E:/movies/Man.Of.Steel.(2013).720p.Dual.Audio.(Hin-Eng).[MoviesFlix.in].mkv");
 		}
 	},
 
@@ -15,6 +15,15 @@ std::initializer_list<PATH_FUNC_T> REGISTERED_FUNCS
 		[](ReqT& req , ResT& res)
 		{
 			res.SendFile("D:/" + req.PATH_DATA["name"]);
+		}
+	},
+
+	{
+		"/upload_any",
+		[](ReqT& req , ResT&)
+		{
+			auto &upFile = req.GetUploadedFiles().at("fl").at(0);
+			upFile.SaveFile("D:/data");
 		}
 	}
 };

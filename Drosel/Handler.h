@@ -5,6 +5,7 @@
 #include<functional>
 #include<sstream>
 #include<vector>
+#include<iostream>
 
 template<class Type>
 concept DerivedFromRequest = std::is_base_of_v<Request, Type>;
@@ -134,8 +135,8 @@ void Handler<RequestT , ResponseT>::operator()(std::function<void(RequestT&, Res
 		connection.Send(RAW_RESPONSE_DATA.data() + (RAW_RESPONSE_DATA.size() - response_size), response_size);
 
 	}
-	catch (const NetworkBuilder::Exception& e)
+	catch (NetworkBuilder::Exception e)
 	{
-
+		std::cerr << e.what();
 	}
 }

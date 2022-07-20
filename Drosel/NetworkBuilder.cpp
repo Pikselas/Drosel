@@ -111,7 +111,7 @@ std::optional<std::pair<const char*,int>> NetworkBuilder::Receive(int size)
 	}
 	else
 	{
-		HasConnection = true;
+		HasConnection = false;
 		ThrowException(WSAGetLastError());
 	}
 	return {};

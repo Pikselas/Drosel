@@ -59,65 +59,72 @@ void DroselServer < RequestT, ResponseT>::RunServer(const std::string& port)
 	server->Listen();
 	while (true)
 	{
-		server->AcceptConnection();
-		std::vector<char> HeadData;
-		HeadData.reserve(1024);
-		int LastFindingPos = 0;
-		while (auto HasData = server->Receive(1024))
+		try
 		{
-			auto RawData = HasData.value();
-			std::copy_n(RawData.first, RawData.second, std::back_inserter(HeadData));
-
-			if ((LastFindingPos = (int)ksTools::FindSubStr(
-				HeadData.data() + std::clamp(LastFindingPos - 4, 0, (int)HeadData.size()),
-				HeadData.size(), "\r\n\r\n", 4
-			)) != HeadData.size()
-				)
+			server->AcceptConnection();
+			std::vector<char> HeadData;
+			HeadData.reserve(1024);
+			int LastFindingPos = 0;
+			while (auto HasData = server->Receive(1024))
 			{
-				break;
-			}
-		}
+				auto RawData = HasData.value();
+				std::copy_n(RawData.first, RawData.second, std::back_inserter(HeadData));
 
-		Parser HeadParser(HeadData.cbegin(), HeadData.cbegin() + LastFindingPos - 1);
-
-		RequestT request = {};
-		request.METHOD = HeadParser.ParseRequestMethod();
-		request.headers = std::move(HeadParser.ParseHeaders());
-		request.ClientIP = server->GetClientIP();
-		request.GET = std::move(HeadParser.ParsePathData());
-
-		std::function<void(RequestT&, ResponseT&)> func = nullptr;
-
-		const auto& path = request.PATH = HeadParser.ParsePath();
-
-		auto itr = PATH_FUNCTIONS.find(path);
-		if (itr != PATH_FUNCTIONS.end())
-		{
-			func = itr->second;
-		}
-		else
-		{
-			for (auto& pr : FROGGED_FUNCTIONS)
-			{
-				if (auto pdt = std::move((pr.first == path)))
+				if ((LastFindingPos = (int)ksTools::FindSubStr(
+					HeadData.data() + std::clamp(LastFindingPos - 4, 0, (int)HeadData.size()),
+					HeadData.size(), "\r\n\r\n", 4
+				)) != HeadData.size()
+					)
 				{
-					func = pr.second;
-					request.PATH_DATA = std::move(pdt.value());
 					break;
 				}
 			}
+
+			Parser HeadParser(HeadData.cbegin(), HeadData.cbegin() + LastFindingPos - 1);
+
+			RequestT request = {};
+			request.METHOD = HeadParser.ParseRequestMethod();
+			request.headers = std::move(HeadParser.ParseHeaders());
+			request.ClientIP = server->GetClientIP();
+			request.GET = std::move(HeadParser.ParsePathData());
+
+			std::function<void(RequestT&, ResponseT&)> func = nullptr;
+
+			const auto& path = request.PATH = HeadParser.ParsePath();
+
+			auto itr = PATH_FUNCTIONS.find(path);
+			if (itr != PATH_FUNCTIONS.end())
+			{
+				func = itr->second;
+			}
+			else
+			{
+				for (auto& pr : FROGGED_FUNCTIONS)
+				{
+					if (auto pdt = std::move((pr.first == path)))
+					{
+						func = pr.second;
+						request.PATH_DATA = std::move(pdt.value());
+						break;
+					}
+				}
+			}
+			std::thread(
+				Handler<RequestT, ResponseT>{
+				std::move(request),
+				{
+					ksTools::seek_itr_forward(HeadData.begin() , HeadData.end() , LastFindingPos + 4),
+					HeadData.end()
+				},
+					FWD_ENGINES,
+					BCKWD_ENGINES,
+					* server
+			}, func).detach();
 		}
-		std::thread(
-		Handler<RequestT, ResponseT>{
-										std::move(request),
-										{
-											ksTools::seek_itr_forward(HeadData.begin() , HeadData.end() , LastFindingPos + 4),
-											HeadData.end()
-										},
-											FWD_ENGINES,
-											BCKWD_ENGINES,
-											*server
-									 },func).detach();
+		catch (NetworkBuilder::Exception e)
+		{
+			std::cerr << e.what();
+		}
 
 	}
 }
